@@ -43,12 +43,14 @@ Properties involved:
     TransactionID, PropertyID, UserID, Price, UserEmail
 
 Justin: 
+
     Property Model + CRUD
     Searching and Filtering logic
     Transaction and Checkout system
     Email notification on purchase
 
 Ravi:
+
     User + Admin models + Login/Registration
     Role-based access(User = read-only, Admin = full CRUD)
     Viewing model + open home listings
