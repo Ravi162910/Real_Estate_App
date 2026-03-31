@@ -42,21 +42,18 @@ Properties involved:
     ViewingID, PropertyID, UserID, Viewing Description, ViewDate
     TransactionID, PropertyID, UserID, Price, UserEmail
 
-
-Justin:
-    -Property model + CRUD
-    -Searching and Filtering Logic
-    -NearbyAmenities field + property detail view
-    -Transaction and Checkout System
-    -Email notification on purchase
+Justin: 
+    Property Model + CRUD
+    Searching and Filtering logic
+    Transaction and Checkout system
+    Email notification on purchase
 
 Ravi:
-    -User + Admin models + Login/Registration
-    -Role-based access(User = read-only, Admin = full CRUD)
-    -Viewing model + open home listings
-    -RetailAgent model
+    User + Admin models + Login/Registration
+    Role-based access(User = read-only, Admin = full CRUD)
+    Viewing model + open home listings
+    RetailAgent model
 
 Advanced features can be done together or by whoever finishes their section first
-
 
 
