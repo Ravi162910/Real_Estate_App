@@ -362,9 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Claude Code
-.claude/
-
 # ASP.NET local settings (may contain connection strings, secrets)
 **/appsettings.Local.json
 **/settings.local.json
