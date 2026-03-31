@@ -42,7 +42,7 @@ Properties involved:
     ViewingID, PropertyID, UserID, Viewing Description, ViewDate
     TransactionID, PropertyID, UserID, Price, UserEmail
 
-Justin: 
+Justin:
 
     Property Model + CRUD
     Searching and Filtering logic
@@ -57,5 +57,3 @@ Ravi:
     RetailAgent model
 
 Advanced features can be done together or by whoever finishes their section first
-
-
