@@ -1,6 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using Real_Estate_App.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// NOTE (Ravi): Change UseSqlite to UseSqlServer and update the connection string in appsettings.json for SQL Server
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
