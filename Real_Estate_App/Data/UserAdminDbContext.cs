@@ -15,6 +15,5 @@ namespace Real_Estate_App.Data
         {
             base.OnModelCreating(modelBuilder);
         }
-        public DbSet<Real_Estate_App.Models.RegisterViewModel> RegisterViewModel { get; set; } = default!;
     }
 }

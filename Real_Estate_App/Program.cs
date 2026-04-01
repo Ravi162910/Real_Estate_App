@@ -1,13 +1,15 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Real_Estate_App.Data;
-using Microsoft.EntityFrameworkCore;
-using Real_Estate_App.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<UserAdminDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // Add services to the container.
-// NOTE (Ravi): Change UseSqlite to UseSqlServer and update the connection string in appsettings.json for SQL Server
+// NOTE: Currently using SQLite for local development.
+// To switch to SQL Server, change UseSqlite to UseSqlServer and update the connection string in appsettings.json:
+//   "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=Accounts_DB;Trusted_Connection=true;MultipleActiveResultSets=true"
+builder.Services.AddDbContext<UserAdminDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
