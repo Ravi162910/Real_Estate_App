@@ -1,0 +1,45 @@
+@model IEnumerable<Real_Estate_App.Models.Property>
+
+@{
+    ViewData["Title"] = "Properties";
+}
+
+<h1>Available Properties</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add New Property</a>
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No properties available at this time. Check back later!
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.PropertyName</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@item.PropertyType</h6>
+                        <p class="card-text">
+                            <strong>Address:</strong> @item.PropertyAddress<br />
+                            <strong>Bedrooms:</strong> @item.PropertyBedrooms |
+                            <strong>Bathrooms:</strong> @item.PropertyBathrooms<br />
+                            <strong>Price:</strong> @item.Price.ToString("C")
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a asp-action="Details" asp-route-id="@item.PropertyId" class="btn btn-sm btn-outline-primary">View Details</a>
+                        <a asp-action="Edit" asp-route-id="@item.PropertyId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.PropertyId" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

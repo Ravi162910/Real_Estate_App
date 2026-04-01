@@ -1,0 +1,72 @@
+@model Real_Estate_App.Models.Property
+
+@{
+    ViewData["Title"] = "Property Details";
+}
+
+<h1>@Model.PropertyName</h1>
+<h4 class="text-muted">@Model.PropertyType</h4>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Property Details</h5>
+                <hr />
+                <dl class="row">
+                    <dt class="col-sm-4">Address</dt>
+                    <dd class="col-sm-8">@Model.PropertyAddress</dd>
+
+                    <dt class="col-sm-4">Price</dt>
+                    <dd class="col-sm-8">@Model.Price.ToString("C")</dd>
+
+                    <dt class="col-sm-4">Bedrooms</dt>
+                    <dd class="col-sm-8">@Model.PropertyBedrooms</dd>
+
+                    <dt class="col-sm-4">Bathrooms</dt>
+                    <dd class="col-sm-8">@Model.PropertyBathrooms</dd>
+
+                    <dt class="col-sm-4">Pets Allowed</dt>
+                    <dd class="col-sm-8">@Model.PropertyPets</dd>
+
+                    <dt class="col-sm-4">Garages</dt>
+                    <dd class="col-sm-8">@Model.PropertyGarages</dd>
+
+                    <dt class="col-sm-4">Available</dt>
+                    <dd class="col-sm-8">@(Model.IsAvailable ? "Yes" : "No")</dd>
+                </dl>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ExtendedDescription))
+        {
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Description</h5>
+                    <p>@Model.ExtendedDescription</p>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.NearbySchools) || !string.IsNullOrEmpty(Model.NearbyShops))
+        {
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Nearby Amenities</h5>
+                    @if (!string.IsNullOrEmpty(Model.NearbySchools))
+                    {
+                        <p><strong>Schools:</strong> @Model.NearbySchools</p>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.NearbyShops))
+                    {
+                        <p><strong>Shops:</strong> @Model.NearbyShops</p>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>

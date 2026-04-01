@@ -1,0 +1,100 @@
+@model Real_Estate_App.Models.Property
+
+@{
+    ViewData["Title"] = "Add Property";
+}
+
+<h1>Add New Property</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="PropertyName" class="form-label"></label>
+                <input asp-for="PropertyName" class="form-control" />
+                <span asp-validation-for="PropertyName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PropertyAddress" class="form-label"></label>
+                <input asp-for="PropertyAddress" class="form-control" />
+                <span asp-validation-for="PropertyAddress" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PropertyType" class="form-label"></label>
+                <select asp-for="PropertyType" class="form-select">
+                    <option value="">-- Select Type --</option>
+                    <option value="House">House</option>
+                    <option value="Apartment">Apartment</option>
+                    <option value="Flat">Flat</option>
+                    <option value="Townhouse">Townhouse</option>
+                    <option value="Studio">Studio</option>
+                </select>
+                <span asp-validation-for="PropertyType" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Price" class="form-label"></label>
+                <input asp-for="Price" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label asp-for="PropertyBedrooms" class="form-label"></label>
+                    <input asp-for="PropertyBedrooms" class="form-control" type="number" />
+                    <span asp-validation-for="PropertyBedrooms" class="text-danger"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="PropertyBathrooms" class="form-label"></label>
+                    <input asp-for="PropertyBathrooms" class="form-control" type="number" />
+                    <span asp-validation-for="PropertyBathrooms" class="text-danger"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="PropertyPets" class="form-label"></label>
+                    <input asp-for="PropertyPets" class="form-control" type="number" />
+                    <span asp-validation-for="PropertyPets" class="text-danger"></span>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label asp-for="PropertyGarages" class="form-label"></label>
+                    <input asp-for="PropertyGarages" class="form-control" type="number" />
+                    <span asp-validation-for="PropertyGarages" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ExtendedDescription" class="form-label"></label>
+                <textarea asp-for="ExtendedDescription" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="ExtendedDescription" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="NearbySchools" class="form-label"></label>
+                <input asp-for="NearbySchools" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="NearbyShops" class="form-label"></label>
+                <input asp-for="NearbyShops" class="form-control" />
+            </div>
+
+            <div class="mb-3 form-check">
+                <input asp-for="IsAvailable" class="form-check-input" />
+                <label asp-for="IsAvailable" class="form-check-label"></label>
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
