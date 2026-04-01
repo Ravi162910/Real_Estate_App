@@ -363,6 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # ASP.NET local settings (may contain connection strings, secrets)
+**/appsettings.Development.json
 **/appsettings.Local.json
 **/settings.local.json
 

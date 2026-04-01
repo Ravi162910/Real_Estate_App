@@ -5,13 +5,20 @@ using Real_Estate_App.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// NOTE: Currently using SQLite for local development.
-// To switch to SQL Server, change UseSqlite to UseSqlServer and update the connection string in appsettings.json:
-//   "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=Accounts_DB;Trusted_Connection=true;MultipleActiveResultSets=true"
-builder.Services.AddDbContext<UserAdminDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Set "DatabaseProvider" to "SqlServer" or "Sqlite" in appsettings.Development.json
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var provider = builder.Configuration["DatabaseProvider"] ?? "Sqlite";
+
+if (provider == "SqlServer")
+{
+    builder.Services.AddDbContext<UserAdminDbContext>(options => options.UseSqlServer(connectionString));
+    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+}
+else
+{
+    builder.Services.AddDbContext<UserAdminDbContext>(options => options.UseSqlite(connectionString));
+    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+}
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();//allow cookie
