@@ -46,6 +46,7 @@ Justin:
 
     Property Model + CRUD
     Searching and Filtering logic
+    NearbyAmenities field + property detail view
     Transaction and Checkout system
     Email notification on purchase
 
