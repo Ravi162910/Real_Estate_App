@@ -377,5 +377,8 @@ FodyWeavers.xsd
 *.db-shm
 *.db-wal
 
+# EF Core Migrations (provider-specific, each dev generates their own)
+**/Migrations/
+
 # Development logs (personal notes)
 DevelopmentLog_*.md
