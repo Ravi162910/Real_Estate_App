@@ -1,0 +1,21 @@
+﻿@model IEnumerable<Real_Estate_App.Models.Agent>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Agency</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var agent in Model)
+        {
+            <tr>
+                <td>@agent.AgentID</td>
+                <td>@agent.Agent_FullName</td>
+                <td>@agent.Agent_AgencyName</td>
+            </tr>
+        }
+    </tbody>
+</table>
