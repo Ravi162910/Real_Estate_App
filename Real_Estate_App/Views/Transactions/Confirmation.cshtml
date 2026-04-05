@@ -1,0 +1,66 @@
+@model Real_Estate_App.Models.Transaction
+
+@{
+    ViewData["Title"] = "Purchase Confirmation";
+    var emailSent = ViewData["EmailSent"] as bool?;
+}
+
+<div class="text-center mt-4">
+    <div class="mb-4">
+        <span style="font-size: 4rem; color: #28a745;">&#10004;</span>
+    </div>
+    <h1 class="text-success">Purchase Successful!</h1>
+    <p class="lead">Thank you for your purchase, <strong>@Model.BuyerName</strong>.</p>
+</div>
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Transaction Receipt</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Transaction ID</dt>
+                    <dd class="col-sm-8">#@Model.TransactionId</dd>
+
+                    <dt class="col-sm-4">Property</dt>
+                    <dd class="col-sm-8">@Model.Property?.PropertyName</dd>
+
+                    <dt class="col-sm-4">Address</dt>
+                    <dd class="col-sm-8">@Model.Property?.PropertyAddress</dd>
+
+                    <dt class="col-sm-4">Price Paid</dt>
+                    <dd class="col-sm-8 fw-bold text-success">@Model.Price.ToString("C")</dd>
+
+                    <dt class="col-sm-4">Buyer</dt>
+                    <dd class="col-sm-8">@Model.BuyerName</dd>
+
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">@Model.UserEmail</dd>
+
+                    <dt class="col-sm-4">Purchase Date</dt>
+                    <dd class="col-sm-8">@Model.PurchaseDate.ToString("dddd, dd MMMM yyyy 'at' hh:mm tt")</dd>
+                </dl>
+            </div>
+        </div>
+
+        @if (emailSent == true)
+        {
+            <div class="alert alert-success mt-3">
+                <strong>Email Sent!</strong> A confirmation email has been sent to <strong>@Model.UserEmail</strong>.
+            </div>
+        }
+        else if (emailSent == false)
+        {
+            <div class="alert alert-warning mt-3">
+                <strong>Note:</strong> We were unable to send a confirmation email. Please save this page for your records.
+            </div>
+        }
+
+        <div class="text-center mt-4">
+            <a asp-controller="Properties" asp-action="Index" class="btn btn-primary btn-lg">Browse More Properties</a>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-lg ms-2">View All Transactions</a>
+        </div>
+    </div>
+</div>

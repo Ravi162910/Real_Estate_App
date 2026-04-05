@@ -1,0 +1,84 @@
+@model Real_Estate_App.Models.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<h1>Checkout</h1>
+<hr />
+
+<div class="row">
+    <!-- Property Summary -->
+    <div class="col-md-5">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Property Summary</h5>
+            </div>
+            <div class="card-body">
+                <h5>@Model.PropertyName</h5>
+                <p class="text-muted">@Model.PropertyAddress</p>
+                <hr />
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fs-5 fw-bold">Total Price:</span>
+                    <span class="fs-4 text-success fw-bold">@Model.Price.ToString("C")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Form -->
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Buyer Details</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Checkout" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="PropertyId" />
+                    <input type="hidden" asp-for="PropertyName" />
+                    <input type="hidden" asp-for="PropertyAddress" />
+                    <input type="hidden" asp-for="Price" />
+
+                    <div class="mb-3">
+                        <label asp-for="BuyerName" class="form-label"></label>
+                        <input asp-for="BuyerName" class="form-control" placeholder="e.g. John Smith" />
+                        <span asp-validation-for="BuyerName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="UserEmail" class="form-label"></label>
+                        <input asp-for="UserEmail" class="form-control" type="email" placeholder="e.g. john@example.com" />
+                        <span asp-validation-for="UserEmail" class="text-danger"></span>
+                        <small class="text-muted">A confirmation email will be sent to this address.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+                        <input asp-for="PhoneNumber" class="form-control" type="tel" placeholder="e.g. 021 123 4567" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="BillingAddress" class="form-label"></label>
+                        <input asp-for="BillingAddress" class="form-control" placeholder="e.g. 10 Main Street, Auckland" />
+                        <span asp-validation-for="BillingAddress" class="text-danger"></span>
+                    </div>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.PropertyId" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            Confirm Purchase - @Model.Price.ToString("C")
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
