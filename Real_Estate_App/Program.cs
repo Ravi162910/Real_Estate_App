@@ -5,25 +5,27 @@ using Real_Estate_App.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AgentDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionSQL")));
-//builder.Services.AddDbContext<AgentDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 // Add services to the container.
 // Set "DatabaseProvider" to "SqlServer" or "Sqlite" in appsettings.Development.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var provider = builder.Configuration["DatabaseProvider"] ?? "Sqlite";
+var connectionStringSql = builder.Configuration.GetConnectionString("DefaultConnectionSQL");
+var provider = builder.Configuration["DatabaseProvider"];
 
 
 
 if (provider == "SqlServer")
 {
-    builder.Services.AddDbContext<UserAdminDbContext>(options => options.UseSqlServer(connectionString));
-    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+    builder.Services.AddDbContext<UserAdminDbContext>(options => options.UseSqlServer(connectionStringSql));
+    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionStringSql));
+    builder.Services.AddDbContext<AgentDbContext>(options => options.UseSqlServer(connectionStringSql));
+    //builder.Services.AddDbContext<>(options => options.UseSqlServer(connectionStringSql));
 }
 else
 {
     builder.Services.AddDbContext<UserAdminDbContext>(options => options.UseSqlite(connectionString));
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+    builder.Services.AddDbContext<AgentDbContext>(options => options.UseSqlite(connectionString));
+    //builder.Services.AddDbContext<>(options => options.UseSqlite(connectionString));
 }
 
 builder.Services.AddControllersWithViews();

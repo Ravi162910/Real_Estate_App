@@ -59,5 +59,15 @@ namespace Real_Estate_App.Models
 
         [Display(Name = "Nearby Shops")]
         public string? NearbyShops { get; set; }
+
+        // Many //
+        public int UserID { get; set; }
+
+        public User_Data Users_Data { get; set; }
+        // Many //
+
+
+
+        public List<Viewing> Property_Viewings { get; set; }// One
     }
 }
