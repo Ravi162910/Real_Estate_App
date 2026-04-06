@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
+using Real_Estate_App.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,8 +11,6 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 var connectionStringSql = builder.Configuration.GetConnectionString("DefaultConnectionSQL");
 var provider = builder.Configuration["DatabaseProvider"];
-
-
 
 if (provider == "SqlServer")
 {
@@ -25,9 +24,9 @@ else
     builder.Services.AddDbContext<UserAdminDbContext>(options => options.UseSqlite(connectionString));
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
     builder.Services.AddDbContext<AgentDbContext>(options => options.UseSqlite(connectionString));
-    //builder.Services.AddDbContext<>(options => options.UseSqlite(connectionString));
 }
 
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();//allow cookie
 var app = builder.Build();

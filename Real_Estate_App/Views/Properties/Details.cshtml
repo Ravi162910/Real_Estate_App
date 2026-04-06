@@ -68,5 +68,14 @@
 </div>
 
 <div class="mt-3">
+    @if (Model.IsAvailable)
+    {
+        <a asp-controller="Transactions" asp-action="Checkout" asp-route-id="@Model.PropertyId"
+           class="btn btn-success btn-lg me-2">Purchase This Property</a>
+    }
+    else
+    {
+        <span class="btn btn-outline-danger btn-lg me-2 disabled">Sold</span>
+    }
     <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>
