@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Real_Estate_App.Models
@@ -11,24 +12,22 @@ namespace Real_Estate_App.Models
 
 
         [Required]
+        [DisplayName("Date/Time for Viewing")]
         public DateTime Viewing_TimeDate { get; set; }
 
-        [Required]
-        public string Viewing_Status { get; set; }
 
-        [Required]
-        public string? Viewing_Description { get; set; }
-
-
+        // Many //
         public int UserID { get; set; }
 
-        public User_Data Users_Data { get; set; }
+        public User_Data? Users { get; set; }
+        // Many //
+
 
 
         // Many //
         public int PropertyID { get; set; }
 
-        public Property PropertiesViewed { get; set; }
+        public Property? Properties { get; set; }
         // Many //
     }
 }

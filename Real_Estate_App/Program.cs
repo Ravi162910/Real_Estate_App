@@ -14,13 +14,12 @@ var provider = builder.Configuration["DatabaseProvider"];
 
 if (provider == "SqlServer")
 {
-    builder.Services.AddDbContext<UserAdminDbContext>(options => options.UseSqlServer(connectionStringSql));
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionStringSql));
+    builder.Services.AddDbContext<UsersPropertiesViewingDbContext>(options => options.UseSqlServer(connectionStringSql));
     //builder.Services.AddDbContext<>(options => options.UseSqlServer(connectionStringSql));
 }
 else
 {
-    builder.Services.AddDbContext<UserAdminDbContext>(options => options.UseSqlite(connectionString));
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
 }
 
@@ -32,6 +31,8 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope()) //Important for Seeding Database data & Auto Migrations when the app runs
 {
     var services = scope.ServiceProvider;
+
+    //PropertySeedData.Initilize(services);
 }
 
 
