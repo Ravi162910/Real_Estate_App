@@ -199,9 +199,9 @@ namespace Real_Estate_App.Controllers
         {
             var userIdClaim = User.FindFirst("UserID")?.Value;
 
-            if (userIdClaim == null)
+            if (userIdClaim == null)// If no User is logged in TODO: Add a message popup to ask the user to kindly login or register
             {
-                return RedirectToAction("Login");
+                return RedirectToAction("Login","UserAdmin");
             }
 
             int userID = int.Parse(userIdClaim);

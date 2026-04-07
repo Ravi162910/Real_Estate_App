@@ -111,5 +111,11 @@ namespace Real_Estate_App.Controllers
             return View();
 
         }
+
+        public IActionResult LoggedOut() 
+        {
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login");
+        }
     }
 }
