@@ -110,7 +110,8 @@ else
                     </div>
                     <div class="card-footer">
                         <a asp-action="Details" asp-route-id="@item.PropertyId" class="btn btn-sm btn-outline-primary">View Details</a>
-                        <a asp-controller="Properties" asp-action="Viewing" asp-route-propertyId="@item.PropertyId" class="btn btn-sm btn-outline-primary">Viewing</a>
+                        <a asp-action="Edit" asp-route-id="@item.PropertyId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.PropertyId" class="btn btn-sm btn-outline-danger">Delete</a>
                     </div>
                 </div>
             </div>

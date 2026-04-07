@@ -60,6 +60,6 @@ namespace Real_Estate_App.Models
         [Display(Name = "Nearby Shops")]
         public string? NearbyShops { get; set; }
 
-        public List<Viewing>? Viewings_list { get; set; }// One
+        public List<Viewing> Property_Viewings { get; set; }// One
     }
 }
