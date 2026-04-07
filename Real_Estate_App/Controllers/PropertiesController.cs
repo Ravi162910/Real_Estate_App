@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
 
@@ -9,9 +10,12 @@ namespace Real_Estate_App.Controllers
     {
         private readonly AppDbContext _context;
 
-        public PropertiesController(AppDbContext context)
+        private readonly UsersPropertiesViewingDbContext _viewingDbContext;
+
+        public PropertiesController(AppDbContext context, UsersPropertiesViewingDbContext viewingDbContext)
         {
             _context = context;
+            _viewingDbContext = viewingDbContext;
         }
 
         // GET: Properties
@@ -111,7 +115,7 @@ namespace Real_Estate_App.Controllers
         // POST: Properties/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PropertyName,PropertyAddress,PropertyBedrooms,PropertyBathrooms,PropertyPets,PropertyGarages,ExtendedDescription,Price,PropertyType,IsAvailable,NearbySchools,NearbyShops")] Property property)
+        public async Task<IActionResult> Create([Bind("PropertyName,PropertyAddress,PropertyBedrooms,PropertyBathrooms,PropertyPets,PropertyGarages,ExtendedDescription,Price,PropertyType,IsAvailable,NearbySchools,NearbyShops")] Models.Property property)
         {
             if (ModelState.IsValid)
             {
@@ -141,7 +145,7 @@ namespace Real_Estate_App.Controllers
         // POST: Properties/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PropertyId,PropertyName,PropertyAddress,PropertyBedrooms,PropertyBathrooms,PropertyPets,PropertyGarages,ExtendedDescription,Price,PropertyType,IsAvailable,NearbySchools,NearbyShops")] Property property)
+        public async Task<IActionResult> Edit(int id, [Bind("PropertyId,PropertyName,PropertyAddress,PropertyBedrooms,PropertyBathrooms,PropertyPets,PropertyGarages,ExtendedDescription,Price,PropertyType,IsAvailable,NearbySchools,NearbyShops")] Models.Property property)
         {
             if (id != property.PropertyId)
             {
@@ -188,6 +192,50 @@ namespace Real_Estate_App.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Viewing(int PropertyID, int UserID, Viewing viewingobj)
+        {
+            var userIdClaim = User.FindFirst("UserID")?.Value;
+
+            if (userIdClaim == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            int userID = int.Parse(userIdClaim);
+
+            if (ModelState.IsValid)
+            {
+                viewingobj.PropertyID = PropertyID;
+                viewingobj.UserID = userID;
+
+                Console.WriteLine(userID);
+
+                _viewingDbContext.ViewingSet.Add(viewingobj);
+                await _viewingDbContext.SaveChangesAsync();
+
+                return RedirectToAction("Index");
+            }
+
+            return View(viewingobj);
+        }
+
+        [HttpGet]
+        public IActionResult Viewing(int propertyID, int userID) 
+        {
+            var modelused = new Viewing
+            {
+                PropertyID = propertyID,
+                UserID = userID
+            };
+            return View(modelused);
+        }
+
+        public IActionResult Viewing() 
+        {
+            return View();
         }
     }
 }

@@ -17,9 +17,9 @@ namespace Real_Estate_App.Controllers
 {
     public class UserAdminController : Controller
     {
-        private readonly UserAdminDbContext _context;
+        private readonly UsersPropertiesViewingDbContext _context;
 
-        public UserAdminController(UserAdminDbContext context)
+        public UserAdminController(UsersPropertiesViewingDbContext context)
         {
             _context = context;
         }
@@ -76,7 +76,8 @@ namespace Real_Estate_App.Controllers
                     var cookieclaims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, useroradmin.First_Name),
-                        new Claim(ClaimTypes.Role, "User")
+                        new Claim(ClaimTypes.Role, "User"),
+                        new Claim("UserID", useroradmin.UserID.ToString())
                     };
                     var claimauthentication = new ClaimsIdentity(cookieclaims, CookieAuthenticationDefaults.AuthenticationScheme);
                     HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimauthentication));
@@ -100,7 +101,7 @@ namespace Real_Estate_App.Controllers
         [Authorize(Roles = "User")]
         public IActionResult LoggedinUsersPage()
         {
-            return View();
+            return RedirectToAction("Index", "Properties");
 
         }
 
