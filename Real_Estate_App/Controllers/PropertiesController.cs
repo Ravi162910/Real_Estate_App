@@ -211,8 +211,6 @@ namespace Real_Estate_App.Controllers
                 viewingobj.PropertyID = PropertyID;
                 viewingobj.UserID = userID;
 
-                Console.WriteLine(userID);
-
                 _viewingDbContext.ViewingSet.Add(viewingobj);
                 await _viewingDbContext.SaveChangesAsync();
 
@@ -236,6 +234,20 @@ namespace Real_Estate_App.Controllers
         public IActionResult Viewing() 
         {
             return View();
+        }
+
+        public IActionResult OwnUserViewing() 
+        {
+            var userIdClaim = User.FindFirst("UserID")?.Value;
+
+            if (userIdClaim == null)// If no User is logged in TODO: Add a message popup to ask the user to kindly login or register
+            {
+                return RedirectToAction("Login", "UserAdmin");// Probably replace this with something else?
+            }
+
+            int userID = int.Parse(userIdClaim);
+            var propertiesviewed = _viewingDbContext.ViewingSet.Where(viewing => viewing.UserID == userID).Include(viewingproperty => viewingproperty.Properties).ToList();
+            return View(propertiesviewed);
         }
     }
 }
