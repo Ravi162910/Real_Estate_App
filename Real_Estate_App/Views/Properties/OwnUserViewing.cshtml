@@ -1,0 +1,18 @@
+﻿@model IList<Real_Estate_App.Models.Viewing>
+
+
+@if (Context.User.Identity.Name != null && Context.User.Identity.Name != "AdminUsername")
+{
+    foreach (var iditems in Model)
+    {
+        <h2>UserID: @iditems.UserID</h2>
+        <p>PropertyID: @iditems.PropertyID</p>
+        <h2>Property Name: @iditems.Properties?.PropertyName</h2>
+        <h2>PropertyID: @iditems.PropertyID</h2>
+        <h2>ViewingID: @iditems.Viewing_ID</h2>
+    }
+}
+else
+{
+    <h2>No viewings Available, please log in and book a viewing</h2>
+}
