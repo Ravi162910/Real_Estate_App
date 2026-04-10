@@ -28,9 +28,11 @@ namespace Real_Estate_App.Models
         [MaxLength(25, ErrorMessage = "25 characters are allowed for the UserName")]
         public string UserName { get; set; }
 
-        [Required(ErrorMessage = "Please fill out this field")]
-        [MaxLength(25, ErrorMessage = "25 characters are allowed for the Password")]
+        [Required]
+        [MaxLength(255)]
         public string Password { get; set; }
+
+        public bool IsAdmin { get; set; }
 
 
         public List<Viewing>? Viewings_list { get; set; }// One

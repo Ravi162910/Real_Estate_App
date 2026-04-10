@@ -1,18 +1,47 @@
-﻿@model IList<Real_Estate_App.Models.Viewing>
+@model IList<Real_Estate_App.Models.Viewing>
 
+@{
+    ViewData["Title"] = "My Viewings";
+}
 
-@if (Context.User.Identity.Name != null && Context.User.Identity.Name != "AdminUsername")
+<h1>My Viewings</h1>
+
+@if (Model.Count == 0)
 {
-    foreach (var iditems in Model)
-    {
-        <h2>UserID: @iditems.UserID</h2>
-        <p>PropertyID: @iditems.PropertyID</p>
-        <h2>Property Name: @iditems.Properties?.PropertyName</h2>
-        <h2>PropertyID: @iditems.PropertyID</h2>
-        <h2>ViewingID: @iditems.Viewing_ID</h2>
-    }
+    <div class="alert alert-info">
+        You have no viewings booked yet. Browse the
+        <a asp-controller="Properties" asp-action="Index">Properties</a> page to book one.
+    </div>
 }
 else
 {
-    <h2>No viewings Available, please log in and book a viewing</h2>
+    <div class="row">
+        @foreach (var viewing in Model)
+        {
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@viewing.Properties?.PropertyName</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">@viewing.Properties?.PropertyAddress</h6>
+                        <p class="card-text mb-1">
+                            <strong>Scheduled:</strong>
+                            @viewing.Viewing_TimeDate.ToString("dddd, d MMM yyyy 'at' h:mm tt")
+                        </p>
+                        @if (viewing.Properties != null)
+                        {
+                            <p class="card-text mb-0">
+                                <strong>Price:</strong> @viewing.Properties.Price.ToString("C")
+                            </p>
+                        }
+                        <a class="btn btn-link px-0"
+                           asp-controller="Properties"
+                           asp-action="Details"
+                           asp-route-id="@viewing.PropertyID">
+                            View property details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 }

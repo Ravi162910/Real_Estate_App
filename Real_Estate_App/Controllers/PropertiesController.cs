@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -236,17 +237,17 @@ namespace Real_Estate_App.Controllers
             return View();
         }
 
-        public IActionResult OwnUserViewing() 
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> OwnUserViewing()
         {
-            var userIdClaim = User.FindFirst("UserID")?.Value;
+            var userID = int.Parse(User.FindFirst("UserID")!.Value);
 
-            if (userIdClaim == null)// If no User is logged in TODO: Add a message popup to ask the user to kindly login or register
-            {
-                return RedirectToAction("Login", "UserAdmin");// Probably replace this with something else?
-            }
+            var propertiesviewed = await _viewingDbContext.ViewingSet
+                .Where(viewing => viewing.UserID == userID)
+                .Include(viewing => viewing.Properties)
+                .OrderBy(viewing => viewing.Viewing_TimeDate)
+                .ToListAsync();
 
-            int userID = int.Parse(userIdClaim);
-            var propertiesviewed = _viewingDbContext.ViewingSet.Where(viewing => viewing.UserID == userID).Include(viewingproperty => viewingproperty.Properties).ToList();
             return View(propertiesviewed);
         }
     }

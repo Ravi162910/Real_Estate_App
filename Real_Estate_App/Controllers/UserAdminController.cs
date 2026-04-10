@@ -11,6 +11,7 @@ using Real_Estate_App.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
 namespace Real_Estate_App.Controllers
@@ -18,10 +19,12 @@ namespace Real_Estate_App.Controllers
     public class UserAdminController : Controller
     {
         private readonly UsersPropertiesViewingDbContext _context;
+        private readonly IPasswordHasher<User_Data> _passwordHasher;
 
-        public UserAdminController(UsersPropertiesViewingDbContext context)
+        public UserAdminController(UsersPropertiesViewingDbContext context, IPasswordHasher<User_Data> passwordHasher)
         {
             _context = context;
+            _passwordHasher = passwordHasher;
         }
 
         public IActionResult Registration()
@@ -30,16 +33,20 @@ namespace Real_Estate_App.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Registration(RegisterViewModel registerViewModelobj)
         {
             if (ModelState.IsValid)
             {
-                User_Data user_Data = new User_Data();
-                user_Data.First_Name = registerViewModelobj.First_Name;
-                user_Data.Last_Name = registerViewModelobj.Last_Name;
-                user_Data.Email = registerViewModelobj.Email;
-                user_Data.UserName = registerViewModelobj.UserName;
-                user_Data.Password = registerViewModelobj.Password;
+                var user_Data = new User_Data
+                {
+                    First_Name = registerViewModelobj.First_Name,
+                    Last_Name = registerViewModelobj.Last_Name,
+                    Email = registerViewModelobj.Email,
+                    UserName = registerViewModelobj.UserName,
+                    IsAdmin = false,
+                };
+                user_Data.Password = _passwordHasher.HashPassword(user_Data, registerViewModelobj.Password);
 
                 try
                 {
@@ -66,36 +73,63 @@ namespace Real_Estate_App.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(LoginViewModel loginViewModelobj)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel loginViewModelobj)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var useroradmin = _context.UsersandAdminsset.Where(x => (x.UserName == loginViewModelobj.UserNameorEmail || x.Email == loginViewModelobj.UserNameorEmail && x.Password == loginViewModelobj.Password)).FirstOrDefault();
-                if (useroradmin != null && useroradmin.UserName != "Adminusername" && useroradmin.Password != "AdminPassword")
-                {
-                    var cookieclaims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, useroradmin.First_Name),
-                        new Claim(ClaimTypes.Role, "User"),
-                        new Claim("UserID", useroradmin.UserID.ToString())
-                    };
-                    var claimauthentication = new ClaimsIdentity(cookieclaims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimauthentication));
-                    return RedirectToAction("LoggedinUsersPage");
-                }
-                else if (useroradmin != null && useroradmin.UserName == "AdminUsername" && useroradmin.Password == "AdminPassword")
-                {
-                    var cookieclaimadmin = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, useroradmin.UserName),
-                        new Claim(ClaimTypes.Role, "Admin")
-                    };
-                    var claimauthentication = new ClaimsIdentity(cookieclaimadmin, CookieAuthenticationDefaults.AuthenticationScheme);
-                    HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimauthentication));
-                    return RedirectToAction("LoggedinAdminPage");
-                }
+                return View(loginViewModelobj);
             }
-            return View(loginViewModelobj);
+
+            // Look up by username or email only — password is verified by the hasher, not the DB
+            var useroradmin = await _context.UsersandAdminsset
+                .FirstOrDefaultAsync(x => x.UserName == loginViewModelobj.UserNameorEmail
+                                       || x.Email == loginViewModelobj.UserNameorEmail);
+
+            if (useroradmin == null)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid username/email or password.");
+                return View(loginViewModelobj);
+            }
+
+            var verifyResult = _passwordHasher.VerifyHashedPassword(
+                useroradmin, useroradmin.Password, loginViewModelobj.Password);
+            bool passwordOk = verifyResult == PasswordVerificationResult.Success
+                           || verifyResult == PasswordVerificationResult.SuccessRehashNeeded;
+
+            // Legacy upgrade: if the stored password is still plain-text (pre-hash era),
+            // accept it and upgrade to a hashed value on this login.
+            if (!passwordOk && useroradmin.Password == loginViewModelobj.Password)
+            {
+                passwordOk = true;
+                verifyResult = PasswordVerificationResult.SuccessRehashNeeded;
+            }
+
+            if (!passwordOk)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid username/email or password.");
+                return View(loginViewModelobj);
+            }
+
+            // Rehash if the stored password was plain-text or used an old algorithm version
+            if (verifyResult == PasswordVerificationResult.SuccessRehashNeeded)
+            {
+                useroradmin.Password = _passwordHasher.HashPassword(useroradmin, loginViewModelobj.Password);
+                await _context.SaveChangesAsync();
+            }
+
+            // Build claims based on IsAdmin flag instead of hardcoded username comparison
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, useroradmin.IsAdmin ? useroradmin.UserName : useroradmin.First_Name),
+                new Claim(ClaimTypes.Role, useroradmin.IsAdmin ? "Admin" : "User"),
+                new Claim("UserID", useroradmin.UserID!.Value.ToString())
+            };
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+
+            return RedirectToAction(useroradmin.IsAdmin ? "LoggedinAdminPage" : "LoggedinUsersPage");
         }
 
         [Authorize(Roles = "User")]
@@ -112,9 +146,12 @@ namespace Real_Estate_App.Controllers
 
         }
 
-        public IActionResult LoggedOut() 
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
         }
     }
