@@ -1,0 +1,21 @@
+﻿@model Viewing
+
+<div class="mb-3">
+    <h1>Property & User Details below:</h1>
+</div>
+<hr />
+<div class="mb-3">
+    <label>User who made the booking:</label>
+    <strong asp-for="PropertyName">@Model.Users.First_Name</strong>
+    <strong asp-for="PropertyName">@Model.Users.Last_Name</strong>
+</div>
+
+<div class="mb-3">
+    <label>Property Name & Address:</label>
+    <strong asp-for="PropertyName">@Model.Properties?.PropertyName, </strong>
+    <strong asp-for="PropertyAddress">@Model.Properties?.PropertyAddress</strong>
+</div>
+
+<a asp-action="Index" asp-route-id="@Model.Viewing_ID" class="btn btn-sm btn-outline-primary">Go back to Viewings List</a>
+<a asp-action="Edit" asp-route-id="@Model.Viewing_ID" class="btn btn-sm btn-primary">Edit</a>
+<a asp-action="Delete" asp-route-id="@Model.Viewing_ID" class="btn btn-sm btn-danger">Delete</a>

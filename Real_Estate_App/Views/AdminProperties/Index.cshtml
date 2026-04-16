@@ -1,14 +1,14 @@
-@model IEnumerable<Real_Estate_App.Models.Property>
+﻿@model IEnumerable<Real_Estate_App.Models.Property>
 
 @{
     ViewData["Title"] = "Properties";
     var propertyTypes = ViewData["PropertyTypes"] as List<string> ?? new List<string>();
 }
 
-<h1>Available Properties</h1>
+<h1>Admin Property Dashboard</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Add New Property</a> @*<- Get rid of this so only admins can add properties*@
+    <a asp-action="Create" class="btn btn-sm btn-outline-primary">Add a property</a>
 </p>
 
 <!-- Search and Filter -->
@@ -90,30 +90,28 @@
         No properties match your search. Try adjusting your filters.
     </div>
 }
-else
-{
-    <p class="text-muted">Showing @Model.Count() properties</p>
-    <div class="row">
-        @foreach (var item in Model)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">@item.PropertyName</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">@item.PropertyType</h6>
-                        <p class="card-text">
-                            <strong>Address:</strong> @item.PropertyAddress<br />
-                            <strong>Bedrooms:</strong> @item.PropertyBedrooms |
-                            <strong>Bathrooms:</strong> @item.PropertyBathrooms<br />
-                            <strong>Price:</strong> @item.Price.ToString("C")
-                        </p>
-                    </div>
-                    <div class="card-footer">
-                        <a asp-action="Details" asp-route-id="@item.PropertyId" class="btn btn-sm btn-outline-primary">View Details</a>
-                        <a asp-controller="Properties" asp-action="Viewing" asp-route-propertyId="@item.PropertyId" class="btn btn-sm btn-outline-primary">Viewing</a>
-                    </div>
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">@item.PropertyName</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">@item.PropertyType</h6>
+                    <p class="card-text">
+                        <strong>Address:</strong> @item.PropertyAddress<br />
+                        <strong>Bedrooms:</strong> @item.PropertyBedrooms |
+                        <strong>Bathrooms:</strong> @item.PropertyBathrooms<br />
+                        <strong>Price:</strong> @item.Price.ToString("C")
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Edit" asp-route-id="@item.PropertyId" class="btn btn-sm btn-primary">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.PropertyId" class="btn btn-sm btn-dark">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.PropertyId" class="btn btn-sm btn-danger">Delete</a>
                 </div>
             </div>
-        }
-    </div>
-}
+        </div>
+    }
+</div>

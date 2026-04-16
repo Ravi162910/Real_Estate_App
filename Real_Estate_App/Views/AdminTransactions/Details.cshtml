@@ -1,0 +1,33 @@
+﻿@model Transaction
+
+<div class="mb-3">
+    <h1>Transaction Details Below:</h1>
+</div>
+<hr />
+<div class="mb-3">
+    <label>Property ID:</label>
+    <strong asp-for="PropertyName">#@Model.PropertyId</strong>
+</div>
+<div class="mb-3">
+    <label>Property Name:</label>
+    <strong asp-for="PropertyName">@Model.Property.PropertyName</strong>
+</div>
+<div class="mb-3">
+    <label>Property Buyer:</label>
+    <strong asp-for="PropertyName">@Model.BuyerName</strong>
+</div>
+<div class="mb-3">
+    <label>Buyer's Email:</label>
+    <strong asp-for="PropertyName">@Model.UserEmail</strong>
+</div>
+<div class="mb-3">
+    <label>Property Buyer:</label>
+    <strong asp-for="PropertyName">@Model.Price.ToString("C")</strong>
+</div>
+<div class="mb-3">
+    <label>Property Purchased on:</label>
+    <strong asp-for="PropertyName">@Model.PurchaseDate.ToString("dd/MM/yyyy hh:mm tt")</strong>
+</div>
+
+<a asp-action="Index" asp-route-id="@Model.PropertyId" class="btn btn-sm btn-primary mt-2">Go back to Transaction List</a>
+
