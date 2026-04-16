@@ -1,0 +1,36 @@
+﻿@model IEnumerable<User_Data>
+
+<h1>Admin Users Dashboard</h1>
+<hr />
+
+<a asp-action="Create" class="btn btn-sm btn-outline-primary mb-4">Add a User here</a>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No Users have been added yet.
+    </div>
+}
+else
+{
+    foreach (var users in Model)
+    {
+        <div class="card mb-3" style="max-width: 540px;">
+            <div class="row g-0">
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">@users.First_Name, @users.Last_Name</h5>
+                        <p class="card-text">@users.UserName</p>
+                        <p class="card-text">@users.Password</p>
+                        <p class="card-text">@users.Email</p>
+                        <a asp-action="Edit" asp-route-id="@users.UserID" class="btn btn-sm btn-primary">Edit</a>
+                        <a asp-action="Details" asp-route-id="@users.UserID" class="btn btn-sm btn-outline-secondary">Details</a>
+                        <a asp-action="Delete" asp-route-id="@users.UserID" class="btn btn-sm btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+
+}

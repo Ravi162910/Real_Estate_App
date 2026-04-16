@@ -1,0 +1,21 @@
+﻿@model Viewing
+
+<h1>Delete Selected Viewing</h1>
+<hr />
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Viewing_ID" />
+    <div class="mb-3">
+        <label>User who made the booking:</label>
+        <strong asp-for="PropertyName">@Model.Users.First_Name</strong>
+        <strong asp-for="PropertyName">@Model.Users.Last_Name</strong>
+    </div>
+
+    <div class="mb-3">
+        <label>Property Name & Address:</label>
+        <strong asp-for="PropertyName">@Model.Properties?.PropertyName, </strong>
+        <strong asp-for="PropertyAddress">@Model.Properties?.PropertyAddress</strong>
+    </div>
+
+    <input type="submit" value="Delete" class="btn btn-danger" />
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

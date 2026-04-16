@@ -1,0 +1,41 @@
+﻿@model User_Data
+
+<h1>Add a User as Admin</h1>
+<hr />
+
+<form method="post">
+    <input type="hidden" asp-for="UserID"/>
+    <div class="mb-3">
+        <label asp-for="First_Name"></label>
+        <input asp-for="First_Name" class="form-control" type="text" />
+        <span asp-validation-for="First_Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Last_Name"></label>
+        <input asp-for="Last_Name" class="form-control" type="text" />
+        <span asp-validation-for="Last_Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" type="text" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" class="form-control" type="text" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" class="form-control" type="text" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <input type="submit" value="Create" class="btn btn-primary mt-3"/>
+    <a asp-action="Index" class="btn btn-outline-secondary mt-3">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

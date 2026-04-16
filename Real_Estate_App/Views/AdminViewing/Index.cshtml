@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Viewing>
+
+<h1>Admin Viewing Dashboard</h1>
+
+<hr/>
+
+<p>
+    <a asp-action="Create" class="btn btn-sm btn-outline-primary">Add a Viewing</a>
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No Viewings booked. Please consider adding atleast 1.
+    </div>
+}
+else
+{
+    @foreach (var property in Model)
+    {
+        <div class="list-group-item">
+            <label>Property Booked:</label>
+            <strong>@property.Properties?.PropertyName, </strong>
+            <strong>@property.Properties?.PropertyAddress</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>User who booked the viewing:</label>
+            <strong>@property.Users?.First_Name</strong>
+            <strong>@property.Users?.Last_Name</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Time/Date of Viewing:</label>
+            <strong>@property.Viewing_TimeDate</strong>
+        </div>
+
+        <div class="list-group-item">
+            <a asp-action="Edit" asp-route-id="@property.Viewing_ID" class="btn btn-sm btn-primary">Edit</a>
+            <a asp-action="Details" asp-route-id="@property.Viewing_ID" class="btn btn-sm btn-dark">Details</a>
+            <a asp-action="Delete" asp-route-id="@property.Viewing_ID" class="btn btn-sm btn-danger">Delete</a>
+        </div>
+    }
+}
+
+
+

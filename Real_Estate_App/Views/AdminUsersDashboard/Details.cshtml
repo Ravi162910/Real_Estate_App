@@ -1,0 +1,30 @@
+﻿@model User_Data
+
+<div class="mb-3">
+    <h1>User Details Below:</h1>
+</div>
+<hr />
+<div class="mb-3">
+    <label>User First Name:</label>
+    <strong>@Model.First_Name</strong>
+</div>
+<div class="mb-3">
+    <label>User Last Name:</label>
+    <strong>@Model.Last_Name</strong>
+</div>
+<div class="mb-3">
+    <label>User Email:</label>
+    <strong>@Model.Email</strong>
+</div>
+<div class="mb-3">
+    <label>Username:</label>
+    <strong>@Model.UserName</strong>
+</div>
+<div class="mb-3">
+    <label>User Password:</label>
+    <strong>@Model.Password</strong>
+</div>
+
+<a asp-action="Index" asp-route-id="@Model.UserID" class="btn btn-sm btn-outline-primary">Go back to User List</a>
+<a asp-action="Edit" asp-route-id="@Model.UserID" class="btn btn-sm btn-primary">Edit</a>
+<a asp-action="Delete" asp-route-id="@Model.UserID" class="btn btn-sm btn-danger">Delete</a>

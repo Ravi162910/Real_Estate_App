@@ -1,0 +1,40 @@
+﻿@model Viewing
+
+<h1>Edit Booking made:</h1>
+
+<hr />
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Viewing_ID" />
+    <input type="hidden" asp-for="PropertyID" />
+    <input type="hidden" asp-for="UserID" />
+
+    <div class="mb-3">
+        <label>Property Name:</label>
+        <input asp-for="Properties.PropertyName" class="form-control" />
+        <span asp-validation-for="Properties.PropertyName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Property Address:</label>
+        <input asp-for="Properties.PropertyAddress" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Viewing_TimeDate"></label>
+        <input asp-for="Viewing_TimeDate" class="form-control" type="datetime-local" />
+        <span asp-validation-for="Viewing_TimeDate" class="text-danger"></span>
+    </div>
+
+    <input type="submit" value="Update" class="btn btn-primary" />
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>
+
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
