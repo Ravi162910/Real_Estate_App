@@ -23,6 +23,7 @@ if (provider == "SqlServer")
 else
 {
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+    builder.Services.AddDbContext<UsersPropertiesViewingDbContext>(options => options.UseSqlite(connectionString));
 }
 
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -47,6 +48,11 @@ using (var scope = app.Services.CreateScope()) //Important for Seeding Database 
     {
         var db = services.GetRequiredService<UsersPropertiesViewingDbContext>();
         var hasher = services.GetRequiredService<IPasswordHasher<User_Data>>();
+
+        if (provider != "SqlServer")
+        {
+            await db.Database.EnsureCreatedAsync();
+        }
 
         if (await db.Database.CanConnectAsync() && !await db.UsersandAdminsset.AnyAsync(u => u.IsAdmin))
         {
