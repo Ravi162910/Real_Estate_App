@@ -16,28 +16,27 @@
         <span asp-validation-for="PropertyAddress" class="text-danger"></span>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="PropertyBedrooms"></label>
-        <input asp-for="PropertyBedrooms" class="form-control" type="number" />
-        <span asp-validation-for="PropertyBedrooms" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="PropertyBathrooms"></label>
-        <input asp-for="PropertyBathrooms" class="form-control" type="number" />
-        <span asp-validation-for="PropertyBathrooms" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="PropertyPets"></label>
-        <input asp-for="PropertyPets" class="form-control" type="number" />
-        <span asp-validation-for="PropertyPets" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="PropertyGarages"></label>
-        <input asp-for="PropertyGarages" class="form-control" type="number" />
-        <span asp-validation-for="PropertyGarages" class="text-danger"></span>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label asp-for="PropertyBedrooms" class="form-label"></label>
+            <input asp-for="PropertyBedrooms" class="form-control" type="number" />
+            <span asp-validation-for="PropertyBedrooms" class="text-danger"></span>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label asp-for="PropertyBathrooms" class="form-label"></label>
+            <input asp-for="PropertyBathrooms" class="form-control" type="number" />
+            <span asp-validation-for="PropertyBathrooms" class="text-danger"></span>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label asp-for="PropertyPets" class="form-label"></label>
+            <input asp-for="PropertyPets" class="form-control" type="number" />
+            <span asp-validation-for="PropertyPets" class="text-danger"></span>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label asp-for="PropertyGarages" class="form-label"></label>
+            <input asp-for="PropertyGarages" class="form-control" type="number" />
+            <span asp-validation-for="PropertyGarages" class="text-danger"></span>
+        </div>
     </div>
 
     <div class="mb-3">

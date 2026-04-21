@@ -3,7 +3,7 @@
 <h1>Edit a User as Admin</h1>
 <hr />
 
-<form asp-action="Edit" method="post">
+<form method="post">
     <input type="hidden" asp-for="UserID" />
     <div class="mb-3">
         <label asp-for="First_Name"></label>
@@ -25,12 +25,7 @@
         <input asp-for="UserName" class="form-control" type="text" />
         <span asp-validation-for="UserName" class="text-danger"></span>
     </div>
-    <div class="mb-3">
-        <label asp-for="Password"></label>
-        <input asp-for="Password" class="form-control" type="text" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <input type="submit" value="Edit" class="btn btn-primary mt-3" />
+    <input type="submit" value="Update" class="btn btn-primary mt-3" />
     <a asp-action="Index" class="btn btn-outline-secondary mt-3">Cancel</a>
 </form>
 

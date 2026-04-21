@@ -10,15 +10,25 @@
     <input type="hidden" asp-for="UserID" />
 
     <div class="mb-3">
-        <label>Property Name:</label>
-        <input asp-for="Properties.PropertyName" class="form-control" />
-        <span asp-validation-for="Properties.PropertyName" class="text-danger"></span>
+        <label asp-for="Users.First_Name">User who has booked: (Firstname) </label>
+        <strong asp-for="First_Name">@Model.Users.First_Name </strong>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Users.Last_Name">User who has booked: (Lastname) </label>
+        <strong asp-for="Last_Name">@Model.Users.Last_Name </strong>
     </div>
 
     <div class="mb-3">
         <label>Property Address:</label>
-        <input asp-for="Properties.PropertyAddress" class="form-control" />
+        <strong asp-for="PropertyName">@Model.Properties?.PropertyName</strong>
     </div>
+
+    <div class="mb-3">
+        <label>Property Address:</label>
+        <strong asp-for="PropertyAddress">@Model.Properties?.PropertyAddress</strong>
+    </div>
+
 
     <div class="mb-3">
         <label asp-for="Viewing_TimeDate"></label>
@@ -29,8 +39,6 @@
     <input type="submit" value="Update" class="btn btn-primary" />
     <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
 </form>
-
-
 
 
 @section Scripts {

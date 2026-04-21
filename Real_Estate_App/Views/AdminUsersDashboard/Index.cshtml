@@ -21,7 +21,6 @@ else
                     <div class="card-body">
                         <h5 class="card-title">@users.First_Name, @users.Last_Name</h5>
                         <p class="card-text">@users.UserName</p>
-                        <p class="card-text">@users.Password</p>
                         <p class="card-text">@users.Email</p>
                         <a asp-action="Edit" asp-route-id="@users.UserID" class="btn btn-sm btn-primary">Edit</a>
                         <a asp-action="Details" asp-route-id="@users.UserID" class="btn btn-sm btn-outline-secondary">Details</a>

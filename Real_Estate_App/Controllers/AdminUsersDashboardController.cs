@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
@@ -8,20 +10,24 @@ namespace Real_Estate_App.Controllers
     public class AdminUsersDashboardController : Controller
     {
         private readonly UsersPropertiesViewingDbContext _userContext;
-        public AdminUsersDashboardController(UsersPropertiesViewingDbContext usersContext)
+        private readonly IPasswordHasher<User_Data> _passwordHasher;
+        public AdminUsersDashboardController(UsersPropertiesViewingDbContext usersContext, IPasswordHasher<User_Data> passwordHasher)
         {
             _userContext = usersContext;
+            _passwordHasher = passwordHasher;
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
             var users = _userContext.UsersandAdminsset.ToList();
             return View(users);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Details(int ID) 
         {
-            if (ID == null) 
+            if (ID == 0) 
             {
                 return NotFound();
             }
@@ -30,15 +36,35 @@ namespace Real_Estate_App.Controllers
             return View(userID);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create() 
         { 
             return View(); 
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(User_Data users) 
+        public IActionResult Create(int ID, User_Data users) 
         {
+
+            users.Password = _passwordHasher.HashPassword(users, users.Password);
+
+            var useemailrobj = _userContext.UsersandAdminsset.Any(user => user.Email == users.Email && user.UserID != ID);
+            if (useemailrobj)
+            {
+                ModelState.AddModelError("Email", "Email already exists.");
+                return View(users);
+            }
+
+            var usernameobj = _userContext.UsersandAdminsset.Any(user => user.UserName == users.UserName && user.UserID != ID);
+
+            if (usernameobj)
+            {
+                ModelState.AddModelError("Username", "Username already exists.");
+                return View(users);
+            }
+
             if (ModelState.IsValid) 
             {
                 _userContext.UsersandAdminsset.Add(users);
@@ -48,6 +74,7 @@ namespace Real_Estate_App.Controllers
             return View(users);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id) 
         {
             var Userobj = _userContext.UsersandAdminsset.Find(id);
@@ -59,6 +86,7 @@ namespace Real_Estate_App.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, User_Data users) 
         {
@@ -69,35 +97,33 @@ namespace Real_Estate_App.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid) 
+
+            var userobj = _userContext.UsersandAdminsset.Any(user => user.Email == users.Email && user.UserID != id);
+            if (userobj)
             {
-                var userobj = _userContext.UsersandAdminsset.Any(user => user.Email == users.Email && user.UserID != id);
-                if (userobj) 
-                {
-                    ModelState.AddModelError("Email", "Email already exists.");
-                    return View(users);
-                }
-
-                var usernameobj = _userContext.UsersandAdminsset.Any(user => user.UserName == users.UserName && user.UserID != id);
-
-                if (usernameobj) 
-                {
-                    ModelState.AddModelError("Username", "Username already exists.");
-                    return View(users);
-                }
-
-                userexists.First_Name = users.First_Name;
-                userexists.Last_Name = users.Last_Name;
-                userexists.Email = users.Email;
-                userexists.UserName = users.UserName;
-                userexists.Password = users.Password;
-
-                _userContext.SaveChanges();
-                return RedirectToAction("Index");
+                ModelState.AddModelError("Email", "Email already exists.");
+                return View(users);
             }
-            return View(users);
+
+            var usernameobj = _userContext.UsersandAdminsset.Any(user => user.UserName == users.UserName && user.UserID != id);
+
+            if (usernameobj)
+            {
+                ModelState.AddModelError("Username", "Username already exists.");
+                return View(users);
+            }
+
+            userexists.First_Name = users.First_Name;
+            userexists.Last_Name = users.Last_Name;
+            userexists.Email = users.Email;
+            userexists.UserName = users.UserName;
+
+            _userContext.UsersandAdminsset.Update(userexists);
+            _userContext.SaveChanges();
+            return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id) 
         {
             var user = _userContext.UsersandAdminsset.FirstOrDefault(user => user.UserID == id);

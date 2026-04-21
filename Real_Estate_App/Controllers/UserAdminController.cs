@@ -142,7 +142,7 @@ namespace Real_Estate_App.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult LoggedinAdminPage()
         {
-            return View();
+            return RedirectToAction("Index", "AdminProperties");
 
         }
 
