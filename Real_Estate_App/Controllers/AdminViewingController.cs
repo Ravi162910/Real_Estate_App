@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Real_Estate_App.Data;
@@ -16,55 +17,71 @@ namespace Real_Estate_App.Controllers
             _appContext = appContext;
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
             var viewings = _context.ViewingSet.Include(viewing => viewing.Properties).Include(users => users.Users).ToList();
             return View(viewings);
         }
 
+        [Authorize(Roles = "Admin")]
         public ActionResult Details(int ID)
         {
             var viewings = _context.ViewingSet.Include(viewing => viewing.Properties).Include(users => users.Users).FirstOrDefault(viewingID => viewingID.Viewing_ID == ID);
             return View(viewings);
         }
 
+        [Authorize(Roles = "Admin")]
         public ActionResult Create()
         {
             return View();
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public ActionResult Create(int propertyID, int userID)
         {
-            var properties = _context.ViewingSet.Select(p => new {PropertyID = p.PropertyID, PropertyName = p.Properties.PropertyName}).ToList();
+            var properties = _context.Properties.Select(property => new { PropertyID = property.PropertyId, PropertyName = property.PropertyName }).ToList();
 
-            var users = _context.ViewingSet.Select(u => new {UserID = u.UserID, UserName = u.Users.UserName}).ToList();
+            var users = _context.UsersandAdminsset.Select(user => new { UserID = user.UserID, UserName = user.UserName }).ToList();
 
             ViewData["PropertyID"] = new SelectList(properties, "PropertyID", "PropertyName");
-
             ViewData["UserID"] = new SelectList(users, "UserID", "UserName");
 
+            ViewBag.AvailableUsers = _context.UsersandAdminsset.Any();
+            ViewBag.AvailableProperties = _context.Properties.Any();
+
             return View();
+
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Viewing viewing)
         {
+
+            var properties = _context.Properties.Select(property => new { PropertyID = property.PropertyId, PropertyName = property.PropertyName }).ToList();
+
+            var users = _context.UsersandAdminsset.Select(user => new { UserID = user.UserID, UserName = user.UserName }).ToList();
+
+            ViewData["PropertyID"] = new SelectList(properties, "PropertyID", "PropertyName");
+            ViewData["UserID"] = new SelectList(users, "UserID", "UserName");
+
+            ViewBag.AvailableUsers = _context.UsersandAdminsset.Any();
+            ViewBag.AvailableProperties = _context.Properties.Any();
+
             if (ModelState.IsValid)
             {
                 _context.ViewingSet.Add(viewing);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
             }
-
-            ViewData["PropertyID"] = new SelectList(_context.ViewingSet.Include(property => property.Properties).Include(propertyname => propertyname.Properties), "PropertyID", "PropertyName");
-            ViewData["UserID"] = new SelectList(_context.ViewingSet.Include(user => user.Users).Include(userName => userName.Users), "UserID", "UserName");
-
+            
             return View(viewing);
         }
 
-
+        [Authorize(Roles = "Admin")]
         public ActionResult Edit(int ID)
         {
             if (ID == null || ID == 0)
@@ -81,21 +98,16 @@ namespace Real_Estate_App.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Viewing viewing)
         {
-            ModelState.Remove("Properties.PropertyType");
-            ModelState.Remove("Properties.Price");
-            if (ModelState.IsValid)
-            {
-                _context.ViewingSet.Update(viewing);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(viewing);
+            _context.ViewingSet.Update(viewing);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
         }
 
-
+        [Authorize(Roles = "Admin")]
         public ActionResult Delete(int ID)
         {
             if (ID == null || ID == 0)

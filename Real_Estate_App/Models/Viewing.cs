@@ -7,7 +7,6 @@ namespace Real_Estate_App.Models
     public class Viewing
     {
         [Key]
-        [BindNever]
         public int Viewing_ID { get; set; }
 
 

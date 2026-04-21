@@ -20,10 +20,6 @@
     <label>Username:</label>
     <strong>@Model.UserName</strong>
 </div>
-<div class="mb-3">
-    <label>User Password:</label>
-    <strong>@Model.Password</strong>
-</div>
 
 <a asp-action="Index" asp-route-id="@Model.UserID" class="btn btn-sm btn-outline-primary">Go back to User List</a>
 <a asp-action="Edit" asp-route-id="@Model.UserID" class="btn btn-sm btn-primary">Edit</a>

@@ -114,7 +114,7 @@ namespace Real_Estate_App.Controllers
 
         public ActionResult Edit(int ID)
         {
-            if (ID == null || ID == 0)
+            if (ID == 0)
             {
                 return NotFound();
             }
