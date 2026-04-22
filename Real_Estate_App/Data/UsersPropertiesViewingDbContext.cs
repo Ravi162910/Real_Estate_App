@@ -12,7 +12,7 @@ namespace Real_Estate_App.Data
 
         public DbSet<User_Data> UsersandAdminsset { get; set; }
 
-        public DbSet<Property> Properties { get; set; }
+        public DbSet<Property> PropertiesSet { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
