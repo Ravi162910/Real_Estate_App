@@ -53,7 +53,7 @@ namespace Real_Estate_App.Controllers
             var useemailrobj = _userContext.UsersandAdminsset.Any(user => user.Email == users.Email && user.UserID != ID);
             if (useemailrobj)
             {
-                ModelState.AddModelError("Email", "Email already exists.");
+                TempData["error"] = "Email already exists.";
                 return View(users);
             }
 
@@ -61,7 +61,7 @@ namespace Real_Estate_App.Controllers
 
             if (usernameobj)
             {
-                ModelState.AddModelError("Username", "Username already exists.");
+                TempData["error"] = "Username already exists.";
                 return View(users);
             }
 
@@ -69,6 +69,7 @@ namespace Real_Estate_App.Controllers
             {
                 _userContext.UsersandAdminsset.Add(users);
                 _userContext.SaveChanges();
+                TempData["success"] = "User successfully added as an admin";
                 return RedirectToAction("Index");
             }
             return View(users);
@@ -101,7 +102,7 @@ namespace Real_Estate_App.Controllers
             var userobj = _userContext.UsersandAdminsset.Any(user => user.Email == users.Email && user.UserID != id);
             if (userobj)
             {
-                ModelState.AddModelError("Email", "Email already exists.");
+                TempData["error"] = "Email already exists.";
                 return View(users);
             }
 
@@ -109,7 +110,7 @@ namespace Real_Estate_App.Controllers
 
             if (usernameobj)
             {
-                ModelState.AddModelError("Username", "Username already exists.");
+                TempData["error"] = "Username already exists.";
                 return View(users);
             }
 
@@ -120,6 +121,7 @@ namespace Real_Estate_App.Controllers
 
             _userContext.UsersandAdminsset.Update(userexists);
             _userContext.SaveChanges();
+            TempData["success"] = "User successfully edited as an admin";
             return RedirectToAction("Index");
         }
 
@@ -144,6 +146,7 @@ namespace Real_Estate_App.Controllers
             {
                 _userContext.UsersandAdminsset.Remove(UsersID);
                 _userContext.SaveChanges(true);
+                TempData["success"] = "User successfully deleted as an admin";
                 return RedirectToAction("Index");
             }
         }
