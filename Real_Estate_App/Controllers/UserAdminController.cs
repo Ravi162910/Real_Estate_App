@@ -53,12 +53,12 @@ namespace Real_Estate_App.Controllers
                     _context.UsersandAdminsset.Add(user_Data);
                     _context.SaveChanges();
                     ModelState.Clear();
-                    //TODO: put viewbag message or follow viewdata popup message lab
-                    return View();
+                    TempData["success"] = "Account Registered Sucessfully! Please Log in...";
+                    return RedirectToAction("Login","UserAdmin");
                 }
                 catch (DbUpdateException ex)
                 {
-                    //TODO: put viewbag message or follow viewdata popup message lab
+                    TempData["error"] = "An error occurred: " + ex.Message;
                     return View(registerViewModelobj);
                 }
             }
@@ -88,7 +88,7 @@ namespace Real_Estate_App.Controllers
 
             if (useroradmin == null)
             {
-                ModelState.AddModelError(string.Empty, "Invalid username/email or password.");
+                TempData["error"] = "Invalid username/email or password.";
                 return View(loginViewModelobj);
             }
 
@@ -107,7 +107,7 @@ namespace Real_Estate_App.Controllers
 
             if (!passwordOk)
             {
-                ModelState.AddModelError(string.Empty, "Invalid username/email or password.");
+                TempData["error"] = "Invalid username/email or password.";
                 return View(loginViewModelobj);
             }
 
@@ -128,6 +128,8 @@ namespace Real_Estate_App.Controllers
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+
+            TempData["success"] = "Login Successfully!";
 
             return RedirectToAction(useroradmin.IsAdmin ? "LoggedinAdminPage" : "LoggedinUsersPage");
         }
@@ -152,6 +154,7 @@ namespace Real_Estate_App.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            TempData["success"] = "Log Out Sucessfully!";
             return RedirectToAction("Login");
         }
     }

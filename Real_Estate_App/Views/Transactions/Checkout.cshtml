@@ -10,7 +10,7 @@
 <div class="row">
     <!-- Property Summary -->
     <div class="col-md-5">
-        <div class="card mb-4">
+        <div class="card mb-4 border-3 shadow">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">Property Summary</h5>
             </div>
@@ -28,7 +28,7 @@
 
     <!-- Checkout Form -->
     <div class="col-md-7">
-        <div class="card">
+        <div class="card border-3 shadow">
             <div class="card-header">
                 <h5 class="mb-0">Buyer Details</h5>
             </div>
@@ -42,26 +42,26 @@
 
                     <div class="mb-3">
                         <label asp-for="BuyerName" class="form-label"></label>
-                        <input asp-for="BuyerName" class="form-control" placeholder="e.g. John Smith" />
+                        <input asp-for="BuyerName" class="form-control border-3 shadow" placeholder="e.g. John Smith" />
                         <span asp-validation-for="BuyerName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="UserEmail" class="form-label"></label>
-                        <input asp-for="UserEmail" class="form-control" type="email" placeholder="e.g. john@example.com" />
+                        <input asp-for="UserEmail" class="form-control border-3 shadow" type="email" placeholder="e.g. john@example.com" />
                         <span asp-validation-for="UserEmail" class="text-danger"></span>
                         <small class="text-muted">A confirmation email will be sent to this address.</small>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="PhoneNumber" class="form-label"></label>
-                        <input asp-for="PhoneNumber" class="form-control" type="tel" placeholder="e.g. 021 123 4567" />
+                        <input asp-for="PhoneNumber" class="form-control border-3 shadow" type="tel" placeholder="e.g. 021 123 4567" />
                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="BillingAddress" class="form-label"></label>
-                        <input asp-for="BillingAddress" class="form-control" placeholder="e.g. 10 Main Street, Auckland" />
+                        <input asp-for="BillingAddress" class="form-control border-3 shadow" placeholder="e.g. 10 Main Street, Auckland" />
                         <span asp-validation-for="BillingAddress" class="text-danger"></span>
                     </div>
 
@@ -70,25 +70,25 @@
 
                     <div class="mb-3">
                         <label asp-for="CardNumber" class="form-label"></label>
-                        <input asp-for="CardNumber" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" />
+                        <input asp-for="CardNumber" class="form-control border-3 shadow" placeholder="1234 5678 9012 3456" maxlength="19" />
                         <span asp-validation-for="CardNumber" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="CardholderName" class="form-label"></label>
-                        <input asp-for="CardholderName" class="form-control" placeholder="e.g. John Smith" />
+                        <input asp-for="CardholderName" class="form-control border-3 shadow" placeholder="e.g. John Smith" />
                         <span asp-validation-for="CardholderName" class="text-danger"></span>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label asp-for="ExpiryDate" class="form-label"></label>
-                            <input asp-for="ExpiryDate" class="form-control" placeholder="MM/YY" maxlength="5" />
+                            <input asp-for="ExpiryDate" class="form-control border-3 shadow" placeholder="MM/YY" maxlength="5" />
                             <span asp-validation-for="ExpiryDate" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label asp-for="Cvv" class="form-label"></label>
-                            <input asp-for="Cvv" class="form-control" type="password" placeholder="123" maxlength="4" />
+                            <input asp-for="Cvv" class="form-control border-3 shadow" type="password" placeholder="123" maxlength="4" />
                             <span asp-validation-for="Cvv" class="text-danger"></span>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
                     <hr />
 
                     <div class="d-flex justify-content-between">
-                        <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.PropertyId" class="btn btn-secondary">Cancel</a>
+                        <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.PropertyId" class="btn btn-secondary"><i class="bi bi-x" style="font-size: 1.1rem; vertical-align: middle"></i> Cancel</a>
                         <button type="submit" class="btn btn-success btn-lg">
                             Confirm Purchase - @Model.Price.ToString("C")
                         </button>

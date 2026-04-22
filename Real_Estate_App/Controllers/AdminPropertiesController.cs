@@ -106,6 +106,7 @@ namespace Real_Estate_App.Controllers
             {
                 _appDbContext.Properties.Add(property);
                 _appDbContext.SaveChanges();
+                TempData["success"] = "Property successfully added as an admin";
                 return RedirectToAction("Index");
             }
             return View(property);
@@ -135,6 +136,7 @@ namespace Real_Estate_App.Controllers
             {
                 _appDbContext.Properties.Update(property);
                 _appDbContext.SaveChanges();
+                TempData["success"] = "Property successfully edited as an admin";
                 return RedirectToAction("Index");
             }
             return View();
@@ -169,6 +171,7 @@ namespace Real_Estate_App.Controllers
             }
             _appDbContext.Properties.Remove(userID);
             _appDbContext.SaveChanges(true);
+            TempData["success"] = "Property successfully deleted as an admin";
             return RedirectToAction("Index");
         }
     }

@@ -75,6 +75,7 @@ namespace Real_Estate_App.Controllers
             {
                 _context.ViewingSet.Add(viewing);
                 _context.SaveChanges();
+                TempData["success"] = "Viewing successfully added as an admin";
                 return RedirectToAction("Index");
             }
             
@@ -84,7 +85,7 @@ namespace Real_Estate_App.Controllers
         [Authorize(Roles = "Admin")]
         public ActionResult Edit(int ID)
         {
-            if (ID == null || ID == 0)
+            if (ID == 0)
             {
                 return NotFound();
             }
@@ -104,13 +105,14 @@ namespace Real_Estate_App.Controllers
         {
             _context.ViewingSet.Update(viewing);
             _context.SaveChanges();
+            TempData["success"] = "Viewing successfully edited as an admin";
             return RedirectToAction("Index");
         }
 
         [Authorize(Roles = "Admin")]
         public ActionResult Delete(int ID)
         {
-            if (ID == null || ID == 0)
+            if (ID == 0)
             {
                 return NotFound();
             }
@@ -140,6 +142,7 @@ namespace Real_Estate_App.Controllers
             {
                 _context.ViewingSet.Remove(viewingID);
                 _context.SaveChanges(true);
+                TempData["success"] = "viewing successfully deleted as an admin";
                 return RedirectToAction("Index");
             }
             return View();

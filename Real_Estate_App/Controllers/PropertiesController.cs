@@ -202,6 +202,7 @@ namespace Real_Estate_App.Controllers
 
             if (userIdClaim == null)// If no User is logged in TODO: Add a message popup to ask the user to kindly login or register
             {
+                TempData["warning"] = "Please log in before booking for any properties";
                 return RedirectToAction("Login","UserAdmin");
             }
 
@@ -214,7 +215,7 @@ namespace Real_Estate_App.Controllers
 
                 _viewingDbContext.ViewingSet.Add(viewingobj);
                 await _viewingDbContext.SaveChangesAsync();
-
+                TempData["success"] = "Viewing Booked Successfully!";
                 return RedirectToAction("Index");
             }
 
