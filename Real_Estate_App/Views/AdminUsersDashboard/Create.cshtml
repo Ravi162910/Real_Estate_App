@@ -1,33 +1,40 @@
 ﻿@model User_Data
 
-<h1>Add a User as Admin</h1>
-<hr />
+<div class="card border-2 mt-4 mb-3">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Add a User as Admin:</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
 <form method="post">
     <input type="hidden" asp-for="UserID"/>
     <div class="mb-3">
         <label asp-for="First_Name"></label>
-        <input asp-for="First_Name" class="form-control" type="text" />
+        <input asp-for="First_Name" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="First_Name" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Last_Name"></label>
-        <input asp-for="Last_Name" class="form-control" type="text" />
+        <input asp-for="Last_Name" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="Last_Name" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" type="text" />
+        <input asp-for="Email" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="UserName"></label>
-        <input asp-for="UserName" class="form-control" type="text" />
+        <input asp-for="UserName" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="UserName" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Password"></label>
-        <input asp-for="Password" class="form-control" type="text" />
+        <input asp-for="Password" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
     <input type="submit" value="Create" class="btn btn-primary mt-3"/>

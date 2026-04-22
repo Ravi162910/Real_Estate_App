@@ -19,7 +19,7 @@ else
         @foreach (var viewing in Model)
         {
             <div class="col-md-6 mb-3">
-                <div class="card">
+                <div class="card shadow">
                     <div class="card-body">
                         <h5 class="card-title">@viewing.Properties?.PropertyName</h5>
                         <h6 class="card-subtitle mb-2 text-muted">@viewing.Properties?.PropertyAddress</h6>
@@ -33,12 +33,7 @@ else
                                 <strong>Price:</strong> @viewing.Properties.Price.ToString("C")
                             </p>
                         }
-                        <a class="btn btn-link px-0"
-                           asp-controller="Properties"
-                           asp-action="Details"
-                           asp-route-id="@viewing.PropertyID">
-                            View property details
-                        </a>
+                        <a class="btn btn-sm btn-outline-primary px-0" asp-controller="Properties" asp-action="Details" asp-route-id="@viewing.PropertyID"><i class="bi bi-card-list"></i> View property details</a>
                     </div>
                 </div>
             </div>

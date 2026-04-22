@@ -5,11 +5,19 @@
     var propertyTypes = ViewData["PropertyTypes"] as List<string> ?? new List<string>();
 }
 
-<h1>Available Properties</h1>
+<div class="card border-2 mt-4 mb-3">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Available Properties:</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- Search and Filter -->
-<div class="card mb-4">
+<div class="card mb-4 shadow border-3">
     <div class="card-body">
         <form asp-action="Index" method="get">
             <!-- Search bar -->
@@ -74,8 +82,8 @@
             </div>
 
             <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Search</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Clear Filters</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Search</button>
+                <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x" style="font-size: 1.3rem; vertical-align: middle"></i> Clear Filters</a>
             </div>
         </form>
     </div>
@@ -94,7 +102,7 @@ else
         @foreach (var item in Model)
         {
             <div class="col-md-4 mb-4">
-                <div class="card h-100">
+                <div class="card h-100 shadow">
                     <div class="card-body">
                         <h5 class="card-title">@item.PropertyName</h5>
                         <h6 class="card-subtitle mb-2 text-muted">@item.PropertyType</h6>
@@ -106,8 +114,8 @@ else
                         </p>
                     </div>
                     <div class="card-footer">
-                        <a asp-action="Details" asp-route-id="@item.PropertyId" class="btn btn-sm btn-outline-primary">View Details</a>
-                        <a asp-controller="Properties" asp-action="Viewing" asp-route-propertyId="@item.PropertyId" class="btn btn-sm btn-outline-primary">Viewing</a>
+                        <a asp-action="Details" asp-route-id="@item.PropertyId" class="btn btn-sm btn-outline-primary"><i class="bi bi-card-list"></i> View Details</a>
+                        <a asp-controller="Properties" asp-action="Viewing" asp-route-propertyId="@item.PropertyId" class="btn btn-sm btn-outline-primary"><i class="bi bi-calendar"></i> Book a Viewing</a>
                     </div>
                 </div>
             </div>

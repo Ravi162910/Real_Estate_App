@@ -2,73 +2,81 @@
 
 <form asp-action="Delete" method="post">
     <input type="hidden" asp-for="PropertyId"/>
-
-    <div class="mb-3">
-        <h1>Property Details Below:</h1>
+    <div class="card shadow border-2 mt-4">
+        <div class="card-header bg-secondary py-4">
+            <div class="row">
+                <div class="col text-center">
+                    <h2 class="py-2">Property Details below for Deletion:</h2>
+                </div>
+            </div>
+        </div>
     </div>
-    <hr />
-    <div class="mb-3">
-        <label>Property Name:</label>
-        <strong asp-for="PropertyName">@Model.PropertyName</strong>
+    <div class="list-group shadow border-2 mb-3">
+        <div class="list-group-item">
+            <label>Property Name:</label>
+            <strong asp-for="PropertyName">@Model.PropertyName</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Address:</label>
+            <strong asp-for="PropertyAddress">@Model.PropertyAddress</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Bedrooms:</label>
+            <strong asp-for="PropertyBedrooms">@Model.PropertyBedrooms</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Bathrooms: </label>
+            <strong asp-for="PropertyBathrooms">@Model.PropertyBathrooms</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Pets</label>
+            <strong asp-for="PropertyPets"> @Model.PropertyPets</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Garages:</label>
+            <strong asp-for="PropertyGarages"> @Model.PropertyGarages</strong>
+        </div>
+
+        <div class="list-group-item">
+            <strong>Property Description:</strong>
+            <p asp-for="ExtendedDescription" class="form-label"> @Model.ExtendedDescription</p>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Price: </label>
+            <strong asp-for="Price">$@Model.Price</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Type: </label>
+            <strong asp-for="PropertyType">@Model.PropertyType</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Nearby School:</label>
+            <strong asp-for="NearbySchools"> @Model.NearbySchools</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Nearby Shops:</label>
+            <strong asp-for="NearbyShops"> @Model.NearbyShops</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Is Available for Viewing:</label>
+            <strong asp-for="IsAvailable"> @(Model.IsAvailable ? "Yes" : "No")</strong>
+        </div>
     </div>
 
-    <div class="mb-3">
-        <label>Property Address:</label>
-        <strong asp-for="PropertyAddress">@Model.PropertyAddress</strong>
-    </div>
-
-    <div class="mb-3">
-        <label>Property Bedrooms:</label>
-        <strong asp-for="PropertyBedrooms">@Model.PropertyBedrooms</strong>
-    </div>
-
-    <div class="mb-3">
-        <label>Property Bathrooms: </label>
-        <strong asp-for="PropertyBathrooms">@Model.PropertyBathrooms</strong>
-    </div>
-
-    <div class="mb-3">
-        <label>Property Pets</label>
-        <strong asp-for="PropertyPets"> @Model.PropertyPets</strong>
-    </div>
-
-    <div class="mb-3">
-        <label>Property Garages:</label>
-        <strong asp-for="PropertyGarages"> @Model.PropertyGarages</strong>
-    </div>
-
-    <div class="mb-3">
-        <strong>Property Description:</strong>
-        <p asp-for="ExtendedDescription" class="form-label"> @Model.ExtendedDescription</p>
-    </div>
-
-    <div class="mb-3">
-        <label>Property Price: </label>
-        <strong asp-for="Price">$@Model.Price</strong>
-    </div>
-
-    <div class="mb-3">
-        <label>Property Type: </label>
-        <strong asp-for="PropertyType">@Model.PropertyType</strong>
-    </div>
-
-    <div class="mb-3">
-        <label>Property Nearby School:</label>
-        <strong asp-for="NearbySchools"> @Model.NearbySchools</strong>
-    </div>
-
-    <div class="mb-3">
-        <label>Property Nearby Shops:</label>
-        <strong asp-for="NearbyShops"> @Model.NearbyShops</strong>
-    </div>
-
-    <div class="mb-3">
-        <label>Property Is Available for Viewing:</label>
-        <strong asp-for="IsAvailable"> @(Model.IsAvailable ? "Yes" : "No")</strong>
-    </div>
-    <input type="submit" value="Delete" class="btn btn-danger" />
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-
+    <button type="submit" class="btn btn-danger">
+        <i class="bi bi-trash" style="font-size: 0.88rem"></i> Delete
+    </button>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x" style="font-size: 1.14rem; vertical-align: middle"></i>Cancel</a>
 </form>
 
 @section Scripts {
@@ -76,3 +84,77 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+
+
+@* <div class="card shadow border-2 mt-4">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Property Details below:</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="list-group shadow mb-sm-4">
+    <div class="list-group-item">
+        <label>Property Name:</label>
+        <strong asp-for="PropertyName">@Model.PropertyName</strong>
+    </div>
+
+    <div class="list-group-item">
+        <label>Property Address:</label>
+        <strong asp-for="PropertyAddress">@Model.PropertyAddress</strong>
+    </div>
+
+    <div class="list-group-item">
+        <label>Property Bedrooms:</label>
+        <strong asp-for="PropertyBedrooms">@Model.PropertyBedrooms</strong>
+    </div>
+
+    <div class="list-group-item">
+        <label>Property Bathrooms: </label>
+        <strong asp-for="PropertyBathrooms">@Model.PropertyBathrooms</strong>
+    </div>
+
+    <div class="list-group-item">
+        <label>Property Pets</label>
+        <strong asp-for="PropertyPets"> @Model.PropertyPets</strong>
+    </div>
+
+    <div class="list-group-item">
+        <label>Property Garages:</label>
+        <strong asp-for="PropertyGarages"> @Model.PropertyGarages</strong>
+    </div>
+
+    <div class="list-group-item">
+        <strong>Property Description:</strong>
+        <p asp-for="ExtendedDescription" class="form-label"> @Model.ExtendedDescription</p>
+    </div>
+
+    <div class="list-group-item">
+        <label>Property Price: </label>
+        <strong asp-for="Price">$@Model.Price</strong>
+    </div>
+
+    <div class="list-group-item">
+        <label>Property Type: </label>
+        <strong asp-for="PropertyType">@Model.PropertyType</strong>
+    </div>
+
+    <div class="list-group-item">
+        <label>Property Nearby School:</label>
+        <strong asp-for="NearbySchools"> @Model.NearbySchools</strong>
+    </div>
+
+    <div class="list-group-item">
+        <label>Property Nearby Shops:</label>
+        <strong asp-for="NearbyShops"> @Model.NearbyShops</strong>
+    </div>
+
+    <div class="list-group-item">
+        <label>Property Is Available for Viewing:</label>
+        <strong asp-for="IsAvailable"> @(Model.IsAvailable ? "Yes" : "No")</strong>
+    </div>
+</div> *@

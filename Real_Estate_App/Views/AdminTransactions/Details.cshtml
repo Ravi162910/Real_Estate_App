@@ -1,33 +1,40 @@
 ﻿@model Transaction
+<div class="card border-2 mt-4">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Transaction Details below:</h2>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="list-group shadow mb-3">
+    <div class="list-group-item">
+        <label>Property ID:</label>
+        <strong asp-for="PropertyName">#@Model.PropertyId</strong>
+    </div>
+    <div class="list-group-item">
+        <label>Property Name:</label>
+        <strong asp-for="PropertyName">@Model.Property.PropertyName</strong>
+    </div>
+    <div class="list-group-item">
+        <label>Property Buyer:</label>
+        <strong asp-for="PropertyName">@Model.BuyerName</strong>
+    </div>
+    <div class="list-group-item">
+        <label>Buyer's Email:</label>
+        <strong asp-for="PropertyName">@Model.UserEmail</strong>
+    </div>
+    <div class="list-group-item">
+        <label>Property Buyer:</label>
+        <strong asp-for="PropertyName">@Model.Price.ToString("C")</strong>
+    </div>
+    <div class="list-group-item">
+        <label>Property Purchased on:</label>
+        <strong asp-for="PropertyName">@Model.PurchaseDate.ToString("dd/MM/yyyy hh:mm tt")</strong>
+    </div>
+</div>
 
-<div class="mb-3">
-    <h1>Transaction Details Below:</h1>
-</div>
-<hr />
-<div class="mb-3">
-    <label>Property ID:</label>
-    <strong asp-for="PropertyName">#@Model.PropertyId</strong>
-</div>
-<div class="mb-3">
-    <label>Property Name:</label>
-    <strong asp-for="PropertyName">@Model.Property.PropertyName</strong>
-</div>
-<div class="mb-3">
-    <label>Property Buyer:</label>
-    <strong asp-for="PropertyName">@Model.BuyerName</strong>
-</div>
-<div class="mb-3">
-    <label>Buyer's Email:</label>
-    <strong asp-for="PropertyName">@Model.UserEmail</strong>
-</div>
-<div class="mb-3">
-    <label>Property Buyer:</label>
-    <strong asp-for="PropertyName">@Model.Price.ToString("C")</strong>
-</div>
-<div class="mb-3">
-    <label>Property Purchased on:</label>
-    <strong asp-for="PropertyName">@Model.PurchaseDate.ToString("dd/MM/yyyy hh:mm tt")</strong>
-</div>
 
-<a asp-action="Index" asp-route-id="@Model.PropertyId" class="btn btn-sm btn-primary mt-2">Go back to Transaction List</a>
+<a asp-action="Index" asp-route-id="@Model.PropertyId" class="btn btn-sm btn-primary mt-2"><i class="bi bi-arrow-left"></i> Go back to Transaction List</a>
 

@@ -1,8 +1,14 @@
 ﻿@model Viewing
 
-<h1>Add a Viewing as Admin</h1>
-
-<hr />
+<div class="card border-2 mt-4">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Add Viewing as an Admin:</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
 @if (!(ViewBag.AvailableUsers ?? false) || !(ViewBag.AvailableProperties ?? false))
 {
@@ -15,26 +21,28 @@ else
     <form method="post">
         <div class="form-group">
             <label class="control-label">Users</label>
-            <select asp-for="UserID" class="form-control" asp-items="@ViewData["UserID"] as SelectList">
+            <select asp-for="UserID" class="form-control border-3 shadow" asp-items="@ViewData["UserID"] as SelectList">
                 <option>--Select a User--</option>
             </select>
             <span asp-validation-for="UserID" class="text-danger"></span>
         </div>
         <div class="form-group, mb-3">
             <label class="control-label">Properties</label>
-            <select asp-for="PropertyID" class="form-control" asp-items="@ViewData["PropertyID"] as SelectList">
+            <select asp-for="PropertyID" class="form-control border-3 shadow" asp-items="@ViewData["PropertyID"] as SelectList">
                 <option>--Select a Property--</option>
             </select>
             <span asp-validation-for="PropertyID" class="text-danger"></span>
         </div>
         <div class="form-group, mb-3">
             <label asp-for="Viewing_TimeDate" class="control-label"></label>
-            <input asp-for="Viewing_TimeDate" class="form-control" type="datetime-local" />
+            <input asp-for="Viewing_TimeDate" class="form-control border-3 shadow" type="datetime-local" />
             <span asp-validation-for="Viewing_TimeDate" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <input type="submit" value="Create" class="btn btn-primary" />
-            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-plus"></i> Create
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x" style="font-size: 1.1rem; vertical-align: middle"></i>Cancel</a>
         </div>
     </form>
 }
