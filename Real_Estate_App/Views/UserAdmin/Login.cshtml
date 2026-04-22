@@ -4,9 +4,8 @@
     ViewData["Title"] = "Login";
 }
 
-<h1>View</h1>
 
-<h4>LoginViewModel</h4>
+<h1>Login</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -14,23 +13,23 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="UserNameorEmail" class="control-label"></label>
-                <input asp-for="UserNameorEmail" class="form-control" />
+                <input asp-for="UserNameorEmail" class="form-control shadow" />
                 <span asp-validation-for="UserNameorEmail" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
-                <input asp-for="Password" class="form-control" />
+                <input asp-for="Password" class="form-control shadow" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Login" class="btn btn-primary" />
+                <input type="submit" value="Login" class="btn btn-primary mt-3" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    Don't have an account, Sign up here: <a asp-action="Registration">Go to Registration Page</a>
+    Don't have an account, Sign up here: <a asp-action="Registration" class="btn btn-sm btn-outline-primary">Go to Registration Page <i class="bi bi-arrow-right"></i></a>
 </div>
 
 @section Scripts {

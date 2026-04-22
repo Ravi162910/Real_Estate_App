@@ -1,21 +1,31 @@
 ﻿@model Viewing
 
-<div class="mb-3">
-    <h1>Property & User Details below:</h1>
-</div>
-<hr />
-<div class="mb-3">
-    <label>User who made the booking:</label>
-    <strong asp-for="PropertyName">@Model.Users.First_Name</strong>
-    <strong asp-for="PropertyName">@Model.Users.Last_Name</strong>
-</div>
-
-<div class="mb-3">
-    <label>Property Name & Address:</label>
-    <strong asp-for="PropertyName">@Model.Properties?.PropertyName, </strong>
-    <strong asp-for="PropertyAddress">@Model.Properties?.PropertyAddress</strong>
+<div class="card shadow border-2 mt-4">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Booked Viewing (Property & User) Details:</h2>
+            </div>
+        </div>
+    </div>
 </div>
 
-<a asp-action="Index" asp-route-id="@Model.Viewing_ID" class="btn btn-sm btn-outline-primary">Go back to Viewings List</a>
-<a asp-action="Edit" asp-route-id="@Model.Viewing_ID" class="btn btn-sm btn-primary">Edit</a>
-<a asp-action="Delete" asp-route-id="@Model.Viewing_ID" class="btn btn-sm btn-danger">Delete</a>
+<div class="list-group">
+    <div class="list-group-item border-3 shadow-sm">
+        <label>User who made the booking:</label>
+        <strong asp-for="PropertyName">@Model.Users.First_Name</strong>
+        <strong asp-for="PropertyName">@Model.Users.Last_Name</strong>
+    </div>
+
+    <div class="list-group-item shadow mb-3">
+        <label>Property Name & Address:</label>
+        <strong asp-for="PropertyName">@Model.Properties?.PropertyName, </strong>
+        <strong asp-for="PropertyAddress">@Model.Properties?.PropertyAddress</strong>
+    </div>
+</div>
+
+
+
+<a asp-action="Index" asp-route-id="@Model.Viewing_ID" class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-left"></i> Go back to Viewings List</a>
+<a asp-action="Edit" asp-route-id="@Model.Viewing_ID" class="btn btn-sm btn-primary"><i class="bi bi-pen"></i> Edit</a>
+<a asp-action="Delete" asp-route-id="@Model.Viewing_ID" class="btn btn-sm btn-danger"><i class="bi bi-trash" style="font-size: 0.88rem"></i> Delete</a>

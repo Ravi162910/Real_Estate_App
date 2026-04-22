@@ -1,9 +1,16 @@
 ﻿@model IEnumerable<User_Data>
 
-<h1>Admin Users Dashboard</h1>
-<hr />
+<div class="card border-2 mt-4">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Admin Users Dashboard:</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
-<a asp-action="Create" class="btn btn-sm btn-outline-primary mb-4">Add a User here</a>
+<a asp-action="Create" class="btn btn-sm btn-outline-primary mb-4 mt-3">Add a User here</a>
 
 @if (!Model.Any())
 {
@@ -15,7 +22,7 @@ else
 {
     foreach (var users in Model)
     {
-        <div class="card mb-3" style="max-width: 540px;">
+        <div class="card mb-3 border-3 shadow" style="max-width: 540px;">
             <div class="row g-0">
                 <div class="col-md-8">
                     <div class="card-body">

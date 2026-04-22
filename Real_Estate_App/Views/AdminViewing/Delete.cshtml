@@ -1,21 +1,33 @@
 ﻿@model Viewing
 
-<h1>Delete Selected Viewing</h1>
-<hr />
+<div class="card shadow border-2 mt-4">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Delete Selected booking:</h2>
+            </div>
+        </div>
+    </div>
+</div>
 <form asp-action="Delete">
     <input type="hidden" asp-for="Viewing_ID" />
-    <div class="mb-3">
-        <label>User who made the booking:</label>
-        <strong asp-for="PropertyName">@Model.Users.First_Name</strong>
-        <strong asp-for="PropertyName">@Model.Users.Last_Name</strong>
+
+    <div class="list-group mb-3">
+        <div class="list-group-item shadow">
+            <label>User who made the booking:</label>
+            <strong asp-for="PropertyName">@Model.Users.First_Name</strong>
+            <strong asp-for="PropertyName">@Model.Users.Last_Name</strong>
+        </div>
+
+        <div class="list-group-item shadow">
+            <label>Property Name & Address:</label>
+            <strong asp-for="PropertyName">@Model.Properties?.PropertyName, </strong>
+            <strong asp-for="PropertyAddress">@Model.Properties?.PropertyAddress</strong>
+        </div>
     </div>
 
-    <div class="mb-3">
-        <label>Property Name & Address:</label>
-        <strong asp-for="PropertyName">@Model.Properties?.PropertyName, </strong>
-        <strong asp-for="PropertyAddress">@Model.Properties?.PropertyAddress</strong>
-    </div>
-
-    <input type="submit" value="Delete" class="btn btn-danger" />
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-danger">
+        <i class="bi bi-trash" style="font-size: 0.88rem"></i> Delete
+    </button>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x" style="font-size: 1.14rem; vertical-align: middle"></i> Cancel</a>
 </form>

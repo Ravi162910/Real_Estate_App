@@ -1,43 +1,52 @@
 ﻿@model Viewing
 
-<h1>Edit Booking made:</h1>
-
-<hr />
+<div class="card shadow border-2 mt-4">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Edit the booking made:</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
 <form asp-action="Edit" method="post">
     <input type="hidden" asp-for="Viewing_ID" />
     <input type="hidden" asp-for="PropertyID" />
     <input type="hidden" asp-for="UserID" />
 
-    <div class="mb-3">
-        <label asp-for="Users.First_Name">User who has booked: (Firstname) </label>
-        <strong asp-for="First_Name">@Model.Users.First_Name </strong>
+    <div class="list-group">
+        <div class="list-group-item">
+            <label asp-for="Users.First_Name">User who has booked: (Firstname) </label>
+            <strong asp-for="First_Name">@Model.Users.First_Name </strong>
+        </div>
+
+        <div class="list-group-item">
+            <label asp-for="Users.Last_Name">User who has booked: (Lastname) </label>
+            <strong asp-for="Last_Name">@Model.Users.Last_Name </strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Address:</label>
+            <strong asp-for="PropertyName">@Model.Properties?.PropertyName</strong>
+        </div>
+
+        <div class="list-group-item">
+            <label>Property Address:</label>
+            <strong asp-for="PropertyAddress">@Model.Properties?.PropertyAddress</strong>
+        </div>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="Users.Last_Name">User who has booked: (Lastname) </label>
-        <strong asp-for="Last_Name">@Model.Users.Last_Name </strong>
-    </div>
-
-    <div class="mb-3">
-        <label>Property Address:</label>
-        <strong asp-for="PropertyName">@Model.Properties?.PropertyName</strong>
-    </div>
-
-    <div class="mb-3">
-        <label>Property Address:</label>
-        <strong asp-for="PropertyAddress">@Model.Properties?.PropertyAddress</strong>
-    </div>
-
-
-    <div class="mb-3">
+    <div class="mt-3 mb-4">
         <label asp-for="Viewing_TimeDate"></label>
-        <input asp-for="Viewing_TimeDate" class="form-control" type="datetime-local" />
+        <input asp-for="Viewing_TimeDate" class="form-control border-3 shadow" type="datetime-local" />
         <span asp-validation-for="Viewing_TimeDate" class="text-danger"></span>
     </div>
 
-    <input type="submit" value="Update" class="btn btn-primary" />
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-pen"></i> Update
+        </button>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x" style="font-size: 1.2rem; vertical-align: middle"></i> Cancel</a>
 </form>
 
 

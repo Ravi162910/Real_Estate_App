@@ -2,26 +2,36 @@
 
 <form method="post">
     <input type="hidden" asp-for="UserID" />
-    <div class="mb-3">
-        <h1>Specific User Details Below:</h1>
+    <div class="card border-2 mt-4">
+        <div class="card-header bg-secondary py-4">
+            <div class="row">
+                <div class="col text-center">
+                    <h2 class="py-2">Specific User Details Below:</h2>
+                </div>
+            </div>
+        </div>
     </div>
-    <hr />
-    <div class="mb-3">
-        <label>User First Name:</label>
-        <strong asp-for="First_Name">@Model.First_Name</strong>
+
+    <div class="list-group border-3">
+        <div class="list-group-item shadow">
+            <label>User First Name:</label>
+            <strong asp-for="First_Name">@Model.First_Name</strong>
+        </div>
+        <div class="list-group-item shadow">
+            <label>User Last Name:</label>
+            <strong>@Model.Last_Name</strong>
+        </div>
+        <div class="list-group-item shadow">
+            <label>User Email:</label>
+            <strong>@Model.Email</strong>
+        </div>
+        <div class="list-group-item shadow">
+            <label>Username:</label>
+            <strong>@Model.UserName</strong>
+        </div>
     </div>
-    <div class="mb-3">
-        <label>User Last Name:</label>
-        <strong>@Model.Last_Name</strong>
-    </div>
-    <div class="mb-3">
-        <label>User Email:</label>
-        <strong>@Model.Email</strong>
-    </div>
-    <div class="mb-3">
-        <label>Username:</label>
-        <strong>@Model.UserName</strong>
-    </div>
+
+
 
     <input type="submit" value="Delete" class="btn btn-danger mt-3" />
     <a asp-action="Index" class="btn btn-outline-secondary mt-3">Cancel</a>

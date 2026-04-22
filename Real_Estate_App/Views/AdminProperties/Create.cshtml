@@ -1,59 +1,67 @@
 @model Property
 
 
-<h1>Add a property as Admin</h1>
+<div class="card border-2 mt-4">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Add Property as an Admin:</h2>
+            </div>
+        </div>
+    </div>
+</div>
 
 <form method="post">
     <div class="mb-3">
         <label asp-for="PropertyName"></label>
-        <input asp-for="PropertyName" class="form-control" type="text" />
+        <input asp-for="PropertyName" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="PropertyName" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="PropertyAddress"></label>
-        <input asp-for="PropertyAddress" class="form-control" type="text" />
+        <input asp-for="PropertyAddress" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="PropertyAddress" class="text-danger"></span>
     </div>
 
     <div class="row">
         <div class="col-md-3 mb-3">
             <label asp-for="PropertyBedrooms" class="form-label"></label>
-            <input asp-for="PropertyBedrooms" class="form-control" type="number" />
+            <input asp-for="PropertyBedrooms" class="form-control border-3 shadow" type="number" />
             <span asp-validation-for="PropertyBedrooms" class="text-danger"></span>
         </div>
         <div class="col-md-3 mb-3">
             <label asp-for="PropertyBathrooms" class="form-label"></label>
-            <input asp-for="PropertyBathrooms" class="form-control" type="number" />
+            <input asp-for="PropertyBathrooms" class="form-control border-3 shadow" type="number" />
             <span asp-validation-for="PropertyBathrooms" class="text-danger"></span>
         </div>
         <div class="col-md-3 mb-3">
             <label asp-for="PropertyPets" class="form-label"></label>
-            <input asp-for="PropertyPets" class="form-control" type="number" />
+            <input asp-for="PropertyPets" class="form-control border-3 shadow" type="number" />
             <span asp-validation-for="PropertyPets" class="text-danger"></span>
         </div>
         <div class="col-md-3 mb-3">
             <label asp-for="PropertyGarages" class="form-label"></label>
-            <input asp-for="PropertyGarages" class="form-control" type="number" />
+            <input asp-for="PropertyGarages" class="form-control border-3 shadow" type="number" />
             <span asp-validation-for="PropertyGarages" class="text-danger"></span>
         </div>
     </div>
 
     <div class="mb-3">
         <label asp-for="ExtendedDescription" class="form-label"></label>
-        <textarea asp-for="ExtendedDescription" class="form-control" rows="4" type="text"></textarea>
+        <textarea asp-for="ExtendedDescription" class="form-control border-3 shadow" rows="4" type="text"></textarea>
         <span asp-validation-for="ExtendedDescription" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Price"></label>
-        <input asp-for="Price" class="form-control" type="number" />
+        <input asp-for="Price" class="form-control border-3 shadow" type="number" />
         <span asp-validation-for="Price" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="PropertyType" class="form-label"></label>
-        <select asp-for="PropertyType" class="form-select">
+        <select asp-for="PropertyType" class="form-select border-3 shadow">
             <option value="">-- Select Type --</option>
             <option value="House">House</option>
             <option value="Apartment">Apartment</option>
@@ -66,13 +74,13 @@
 
     <div class="mb-3">
         <label asp-for="NearbySchools"></label>
-        <input asp-for="NearbySchools" class="form-control" type="text" />
+        <input asp-for="NearbySchools" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="NearbySchools" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="NearbyShops"></label>
-        <input asp-for="NearbyShops" class="form-control" type="text" />
+        <input asp-for="NearbyShops" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="NearbyShops" class="text-danger"></span>
     </div>
 
@@ -81,8 +89,10 @@
         <input asp-for="IsAvailable" type="checkbox" />
         <span asp-validation-for="IsAvailable" class="text-danger"></span>
     </div>
-    <input type="submit" value="Create" class="btn btn-primary" />
-    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-plus"></i> Create
+    </button>
+    <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-x" style="font-size: 1.1rem; vertical-align: middle"></i>Cancel</a>
     @* <div asp-validation-summary="All" class="text-danger"></div> *@
 </form>
 
