@@ -10,7 +10,7 @@
     </div>
 </div>
 
-<a asp-action="Create" class="btn btn-sm btn-outline-primary mb-4 mt-3">Add a User here</a>
+<a asp-action="Create" class="btn btn-sm btn-outline-primary mb-4 mt-3"> <i class="bi bi-plus-square-fill"></i> Add a User here</a>
 
 @if (!Model.Any())
 {
@@ -29,9 +29,9 @@ else
                         <h5 class="card-title">@users.First_Name, @users.Last_Name</h5>
                         <p class="card-text">@users.UserName</p>
                         <p class="card-text">@users.Email</p>
-                        <a asp-action="Edit" asp-route-id="@users.UserID" class="btn btn-sm btn-primary">Edit</a>
-                        <a asp-action="Details" asp-route-id="@users.UserID" class="btn btn-sm btn-outline-secondary">Details</a>
-                        <a asp-action="Delete" asp-route-id="@users.UserID" class="btn btn-sm btn-danger">Delete</a>
+                        <a asp-action="Edit" asp-route-id="@users.UserID" class="btn btn-sm btn-primary"><i class="bi bi-pen"></i> Edit</a>
+                        <a asp-action="Details" asp-route-id="@users.UserID" class="btn btn-sm btn-outline-secondary"><i class="bi bi-card-list"></i> Details</a>
+                        <a asp-action="Delete" asp-route-id="@users.UserID" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Delete</a>
                     </div>
                 </div>
             </div>

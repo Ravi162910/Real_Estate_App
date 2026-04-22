@@ -37,8 +37,10 @@
         <input asp-for="Password" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
-    <input type="submit" value="Create" class="btn btn-primary mt-3"/>
-    <a asp-action="Index" class="btn btn-outline-secondary mt-3">Cancel</a>
+    <button type="submit" class="btn btn-primary mt-3">
+        <i class="bi bi-plus"></i> Create
+    </button>
+    <a asp-action="Index" class="btn btn-outline-secondary mt-3"><i class="bi bi-x" style="font-size: 1.1rem; vertical-align: middle"></i> Cancel</a>
 </form>
 
 @section Scripts {
