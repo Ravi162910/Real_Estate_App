@@ -103,7 +103,7 @@ namespace Real_Estate_App.Controllers
             // Send email notification
             try
             {
-                await _emailService.SendPurchaseConfirmationAsync(
+                var sent = await _emailService.SendPurchaseConfirmationAsync(
                     model.UserEmail,
                     model.BuyerName,
                     property.PropertyName,
@@ -111,7 +111,7 @@ namespace Real_Estate_App.Controllers
                     property.Price,
                     transaction.PurchaseDate
                 );
-                TempData["EmailSent"] = true;
+                TempData["EmailSent"] = sent;
             }
             catch (Exception ex)
             {

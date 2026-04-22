@@ -5,7 +5,7 @@ namespace Real_Estate_App.Services
 {
     public interface IEmailService
     {
-        Task SendPurchaseConfirmationAsync(string toEmail, string buyerName, string propertyName, string propertyAddress, decimal price, DateTime purchaseDate);
+        Task<bool> SendPurchaseConfirmationAsync(string toEmail, string buyerName, string propertyName, string propertyAddress, decimal price, DateTime purchaseDate);
     }
 
     public class EmailService : IEmailService
@@ -19,7 +19,7 @@ namespace Real_Estate_App.Services
             _logger = logger;
         }
 
-        public async Task SendPurchaseConfirmationAsync(string toEmail, string buyerName, string propertyName, string propertyAddress, decimal price, DateTime purchaseDate)
+        public async Task<bool> SendPurchaseConfirmationAsync(string toEmail, string buyerName, string propertyName, string propertyAddress, decimal price, DateTime purchaseDate)
         {
             var smtpSettings = _configuration.GetSection("SmtpSettings");
             var host = smtpSettings["Host"] ?? "smtp.gmail.com";
@@ -27,6 +27,12 @@ namespace Real_Estate_App.Services
             var senderEmail = smtpSettings["SenderEmail"] ?? "";
             var senderPassword = smtpSettings["SenderPassword"] ?? "";
             var senderName = smtpSettings["SenderName"] ?? "Real Estate App";
+
+            if (string.IsNullOrWhiteSpace(senderEmail) || string.IsNullOrWhiteSpace(senderPassword))
+            {
+                _logger.LogWarning("SMTP sender credentials are not configured. Skipping purchase confirmation email to {Email}. Set SmtpSettings:SenderEmail and SmtpSettings:SenderPassword in appsettings.Development.json to enable email.", toEmail);
+                return false;
+            }
 
             var subject = $"Purchase Confirmation - {propertyName}";
             var body = $@"
@@ -88,6 +94,7 @@ namespace Real_Estate_App.Services
 
                 await client.SendMailAsync(mailMessage);
                 _logger.LogInformation("Purchase confirmation email sent to {Email} for property {Property}", toEmail, propertyName);
+                return true;
             }
             catch (Exception ex)
             {
