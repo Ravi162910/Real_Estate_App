@@ -9,14 +9,12 @@ namespace Real_Estate_App.Controllers
 {
     public class TransactionsController : Controller
     {
-        private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
         private readonly ILogger<TransactionsController> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
-        public TransactionsController(AppDbContext context, IEmailService emailService, ILogger<TransactionsController> logger, IUnitOfWork unitOfWork)
+        public TransactionsController(IEmailService emailService, ILogger<TransactionsController> logger, IUnitOfWork unitOfWork)
         {
-            _context = context;
             _emailService = emailService;
             _logger = logger;
             _unitOfWork = unitOfWork;
@@ -25,11 +23,6 @@ namespace Real_Estate_App.Controllers
         // GET: Transactions/Checkout/5
         public async Task<IActionResult> Checkout(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var property = await _unitOfWork.Properties.GetByIdAsync(id);
             if (property == null)
             {
@@ -117,11 +110,6 @@ namespace Real_Estate_App.Controllers
         // GET: Transactions/Confirmation/5
         public async Task<IActionResult> Confirmation(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var transaction = await _unitOfWork.Transactions.GetByIdWithPropertyAsync(id);
 
             if (transaction == null)

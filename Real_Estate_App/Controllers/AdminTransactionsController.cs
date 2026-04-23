@@ -10,11 +10,9 @@ namespace Real_Estate_App.Controllers
 {
     public class AdminTransactionsController : Controller
     {
-        private readonly AppDbContext _appContext;
         private readonly IUnitOfWork _unitofwork;
-        public AdminTransactionsController(AppDbContext appContext, IUnitOfWork unitOfWork)
+        public AdminTransactionsController(IUnitOfWork unitOfWork)
         {
-            _appContext = appContext;
             _unitofwork = unitOfWork;
         }
 

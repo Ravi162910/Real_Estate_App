@@ -10,12 +10,10 @@ namespace Real_Estate_App.Controllers
 {
     public class AdminUsersDashboardController : Controller
     {
-        private readonly AppDbContext _userContext;
         private readonly IPasswordHasher<User_Data> _passwordHasher;
         private readonly IUnitOfWork _unitOfWork;
-        public AdminUsersDashboardController(AppDbContext usersContext, IPasswordHasher<User_Data> passwordHasher, IUnitOfWork unitOfWork)
+        public AdminUsersDashboardController(IPasswordHasher<User_Data> passwordHasher, IUnitOfWork unitOfWork)
         {
-            _userContext = usersContext;
             _passwordHasher = passwordHasher;
             _unitOfWork = unitOfWork;
         }
@@ -102,16 +100,15 @@ namespace Real_Estate_App.Controllers
             }
 
 
-            var userobj = await _unitOfWork.Users.UsernameExistsAsync(users.UserName, id);
-            if (userobj)
+            var emailTaken = await _unitOfWork.Users.EmailExistsAsync(users.Email, id);
+            if (emailTaken)
             {
                 TempData["error"] = "Email already exists.";
                 return View(users);
             }
 
-            var usernameobj = await _unitOfWork.Users.EmailExistsAsync(users.Email, id);
-
-            if (usernameobj)
+            var usernameTaken = await _unitOfWork.Users.UsernameExistsAsync(users.UserName, id);
+            if (usernameTaken)
             {
                 TempData["error"] = "Username already exists.";
                 return View(users);
@@ -129,9 +126,9 @@ namespace Real_Estate_App.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Delete(int id) 
+        public async Task<IActionResult> Delete(int id)
         {
-            var user = _userContext.UsersandAdminsset.FirstOrDefault(user => user.UserID == id);
+            var user = await _unitOfWork.Users.GetByIdAsync(id);
             return View(user);
         }
 

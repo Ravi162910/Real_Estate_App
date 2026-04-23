@@ -10,11 +10,9 @@ namespace Real_Estate_App.Controllers
 {
     public class PropertiesController : Controller
     {
-        private readonly AppDbContext _context;
         private readonly IUnitOfWork _unitofwork;
-        public PropertiesController(AppDbContext context, IUnitOfWork unitOfWork)
+        public PropertiesController(IUnitOfWork unitOfWork)
         {
-            _context = context;
             _unitofwork = unitOfWork;
         }
 
@@ -24,7 +22,7 @@ namespace Real_Estate_App.Controllers
                     decimal? minPrice, decimal? maxPrice, int? minGarages, int? minPets)
         {
 
-            var unitofwork = await _unitofwork.Properties.GetAvailableFilteredAsync(searchString, propertyType, minBedrooms, maxBedrooms, minBathrooms, maxBathrooms, minPrice, maxPrice, minGarages, minPets);
+            var properties = await _unitofwork.Properties.GetAvailableFilteredAsync(searchString, propertyType, minBedrooms, maxBedrooms, minBathrooms, maxBathrooms, minPrice, maxPrice, minGarages, minPets);
 
             // Pass current filter values back to the view
             ViewData["SearchString"] = searchString;
@@ -41,17 +39,12 @@ namespace Real_Estate_App.Controllers
             // Get distinct property types for the dropdown
             ViewData["PropertyTypes"] = await _unitofwork.Properties.GetDistinctPropertyTypesAsync();
 
-            return View(unitofwork.ToList());
+            return View(properties.ToList());
         }
 
         // GET: Properties/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var property = await _unitofwork.Properties.GetByIdAsync(id);
 
             if (property == null)
