@@ -17,13 +17,10 @@ var provider = builder.Configuration["DatabaseProvider"];
 if (provider == "SqlServer")
 {
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionStringSql));
-    builder.Services.AddDbContext<UsersPropertiesViewingDbContext>(options => options.UseSqlServer(connectionStringSql));
-    //builder.Services.AddDbContext<>(options => options.UseSqlServer(connectionStringSql));
 }
 else
 {
     builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
-    builder.Services.AddDbContext<UsersPropertiesViewingDbContext>(options => options.UseSqlite(connectionString));
 }
 
 builder.Services.AddScoped<IEmailService, EmailService>();
@@ -46,7 +43,7 @@ using (var scope = app.Services.CreateScope()) //Important for Seeding Database 
     // Seed an admin user if none exists (or promote a legacy "AdminUsername" row)
     try
     {
-        var db = services.GetRequiredService<UsersPropertiesViewingDbContext>();
+        var db = services.GetRequiredService<AppDbContext>();
         var hasher = services.GetRequiredService<IPasswordHasher<User_Data>>();
 
         if (provider != "SqlServer")

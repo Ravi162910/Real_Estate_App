@@ -9,9 +9,9 @@ namespace Real_Estate_App.Controllers
 {
     public class AdminUsersDashboardController : Controller
     {
-        private readonly UsersPropertiesViewingDbContext _userContext;
+        private readonly AppDbContext _userContext;
         private readonly IPasswordHasher<User_Data> _passwordHasher;
-        public AdminUsersDashboardController(UsersPropertiesViewingDbContext usersContext, IPasswordHasher<User_Data> passwordHasher)
+        public AdminUsersDashboardController(AppDbContext usersContext, IPasswordHasher<User_Data> passwordHasher)
         {
             _userContext = usersContext;
             _passwordHasher = passwordHasher;

@@ -11,12 +11,9 @@ namespace Real_Estate_App.Controllers
     {
         private readonly AppDbContext _context;
 
-        private readonly UsersPropertiesViewingDbContext _viewingDbContext;
-
-        public PropertiesController(AppDbContext context, UsersPropertiesViewingDbContext viewingDbContext)
+        public PropertiesController(AppDbContext context)
         {
             _context = context;
-            _viewingDbContext = viewingDbContext;
         }
 
         // GET: Properties
@@ -213,8 +210,8 @@ namespace Real_Estate_App.Controllers
                 viewingobj.PropertyID = PropertyID;
                 viewingobj.UserID = userID;
 
-                _viewingDbContext.ViewingSet.Add(viewingobj);
-                await _viewingDbContext.SaveChangesAsync();
+                _context.ViewingSet.Add(viewingobj);
+                await _context.SaveChangesAsync();
                 TempData["success"] = "Viewing Booked Successfully!";
                 return RedirectToAction("Index");
             }
@@ -243,7 +240,7 @@ namespace Real_Estate_App.Controllers
         {
             var userID = int.Parse(User.FindFirst("UserID")!.Value);
 
-            var propertiesviewed = await _viewingDbContext.ViewingSet
+            var propertiesviewed = await _context.ViewingSet
                 .Where(viewing => viewing.UserID == userID)
                 .Include(viewing => viewing.Properties)
                 .OrderBy(viewing => viewing.Viewing_TimeDate)

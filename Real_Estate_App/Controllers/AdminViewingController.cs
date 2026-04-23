@@ -9,12 +9,10 @@ namespace Real_Estate_App.Controllers
 {
     public class AdminViewingController : Controller
     {
-        private readonly UsersPropertiesViewingDbContext _context;
-        private readonly AppDbContext _appContext;
-        public AdminViewingController(UsersPropertiesViewingDbContext context, AppDbContext appContext)
+        private readonly AppDbContext _context;
+        public AdminViewingController(AppDbContext context)
         {
             _context = context;
-            _appContext = appContext;
         }
 
         [Authorize(Roles = "Admin")]
@@ -41,7 +39,7 @@ namespace Real_Estate_App.Controllers
         [Authorize(Roles = "Admin")]
         public ActionResult Create(int propertyID, int userID)
         {
-            var properties = _context.PropertiesSet.Select(property => new { PropertyID = property.PropertyId, PropertyName = property.PropertyName }).ToList();
+            var properties = _context.Properties.Select(property => new { PropertyID = property.PropertyId, PropertyName = property.PropertyName }).ToList();
 
             var users = _context.UsersandAdminsset.Select(user => new { UserID = user.UserID, UserName = user.UserName }).ToList();
 
@@ -49,7 +47,7 @@ namespace Real_Estate_App.Controllers
             ViewData["UserID"] = new SelectList(users, "UserID", "UserName");
 
             ViewBag.AvailableUsers = _context.UsersandAdminsset.Any();
-            ViewBag.AvailableProperties = _context.PropertiesSet.Any();
+            ViewBag.AvailableProperties = _context.Properties.Any();
 
             return View();
 
@@ -61,7 +59,7 @@ namespace Real_Estate_App.Controllers
         public ActionResult Create(Viewing viewing)
         {
 
-            var properties = _context.PropertiesSet.Select(property => new { PropertyID = property.PropertyId, PropertyName = property.PropertyName }).ToList();
+            var properties = _context.Properties.Select(property => new { PropertyID = property.PropertyId, PropertyName = property.PropertyName }).ToList();
 
             var users = _context.UsersandAdminsset.Select(user => new { UserID = user.UserID, UserName = user.UserName }).ToList();
 
@@ -69,7 +67,7 @@ namespace Real_Estate_App.Controllers
             ViewData["UserID"] = new SelectList(users, "UserID", "UserName");
 
             ViewBag.AvailableUsers = _context.UsersandAdminsset.Any();
-            ViewBag.AvailableProperties = _context.PropertiesSet.Any();
+            ViewBag.AvailableProperties = _context.Properties.Any();
 
             if (ModelState.IsValid)
             {

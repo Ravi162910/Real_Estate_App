@@ -13,6 +13,10 @@ namespace Real_Estate_App.Data
 
         public DbSet<Transaction> Transactions { get; set; }
 
+        public DbSet<Viewing> ViewingSet { get; set; }
+
+        public DbSet<User_Data> UsersandAdminsset { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -31,6 +35,18 @@ namespace Real_Estate_App.Data
                       .WithMany()
                       .HasForeignKey(t => t.PropertyId);
             });
+
+            modelBuilder.Entity<Viewing>()
+                .HasOne(viewing => viewing.Users)
+                .WithMany(users => users.Viewings_list)
+                .HasForeignKey(viewing => viewing.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Viewing>()
+                .HasOne(viewing => viewing.Properties)
+                .WithMany(properties => properties.Viewings_list)
+                .HasForeignKey(viewing => viewing.PropertyID)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Seed data - example properties
             modelBuilder.Entity<Property>().HasData(

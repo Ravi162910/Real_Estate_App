@@ -9,11 +9,9 @@ namespace Real_Estate_App.Controllers
 {
     public class AdminTransactionsController : Controller
     {
-        private readonly UsersPropertiesViewingDbContext _context;
         private readonly AppDbContext _appContext;
-        public AdminTransactionsController(UsersPropertiesViewingDbContext context, AppDbContext appContext)
+        public AdminTransactionsController(AppDbContext appContext)
         {
-            _context = context;
             _appContext = appContext;
         }
 
