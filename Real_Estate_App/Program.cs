@@ -1,10 +1,11 @@
-using System.Data.Common;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
 using Real_Estate_App.Services;
+using Real_Estate_App.UnitOfWork;
+using System.Data.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,7 @@ else
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<IPasswordHasher<User_Data>, PasswordHasher<User_Data>>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

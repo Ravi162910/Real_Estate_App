@@ -4,28 +4,31 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
+using Real_Estate_App.UnitOfWork;
 
 namespace Real_Estate_App.Controllers
 {
     public class AdminTransactionsController : Controller
     {
         private readonly AppDbContext _appContext;
-        public AdminTransactionsController(AppDbContext appContext)
+        private readonly IUnitOfWork _unitofwork;
+        public AdminTransactionsController(AppDbContext appContext, IUnitOfWork unitOfWork)
         {
             _appContext = appContext;
+            _unitofwork = unitOfWork;
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var viewings = _appContext.Transactions.Include(properties => properties.Property).ToList();
+            var viewings = await _unitofwork.Transactions.GetAllWithPropertyAsync();
             return View(viewings);
         }
 
         [Authorize(Roles = "Admin")]
-        public ActionResult Details(int ID)
+        public async Task<ActionResult> Details(int ID)
         {
-            var viewings = _appContext.Transactions.Include(property => property.Property).FirstOrDefault(transactionID => transactionID.TransactionId == ID);
+            var viewings = await _unitofwork.Transactions.GetByIdWithPropertyAsync(ID);
             return View(viewings);
         }
     }
