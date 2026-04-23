@@ -4,64 +4,27 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
+using Real_Estate_App.UnitOfWork;
 
 namespace Real_Estate_App.Controllers
 {
     public class PropertiesController : Controller
     {
         private readonly AppDbContext _context;
-
-        public PropertiesController(AppDbContext context)
+        private readonly IUnitOfWork _unitofwork;
+        public PropertiesController(AppDbContext context, IUnitOfWork unitOfWork)
         {
             _context = context;
+            _unitofwork = unitOfWork;
         }
 
         // GET: Properties
         public async Task<IActionResult> Index(string? searchString, string? propertyType,
-            int? minBedrooms, int? maxBedrooms, int? minBathrooms, int? maxBathrooms,
-            decimal? minPrice, decimal? maxPrice, int? minGarages, int? minPets)
+                    int? minBedrooms, int? maxBedrooms, int? minBathrooms, int? maxBathrooms,
+                    decimal? minPrice, decimal? maxPrice, int? minGarages, int? minPets)
         {
-            var properties = _context.Properties.Where(p => p.IsAvailable);
 
-            // Search by name or address
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                properties = properties.Where(p =>
-                    p.PropertyName.Contains(searchString) ||
-                    p.PropertyAddress.Contains(searchString));
-            }
-
-            // Filter by property type
-            if (!string.IsNullOrEmpty(propertyType))
-            {
-                properties = properties.Where(p => p.PropertyType == propertyType);
-            }
-
-            // Filter by bedrooms
-            if (minBedrooms.HasValue)
-                properties = properties.Where(p => p.PropertyBedrooms >= minBedrooms.Value);
-            if (maxBedrooms.HasValue)
-                properties = properties.Where(p => p.PropertyBedrooms <= maxBedrooms.Value);
-
-            // Filter by bathrooms
-            if (minBathrooms.HasValue)
-                properties = properties.Where(p => p.PropertyBathrooms >= minBathrooms.Value);
-            if (maxBathrooms.HasValue)
-                properties = properties.Where(p => p.PropertyBathrooms <= maxBathrooms.Value);
-
-            // Filter by price
-            if (minPrice.HasValue)
-                properties = properties.Where(p => p.Price >= minPrice.Value);
-            if (maxPrice.HasValue)
-                properties = properties.Where(p => p.Price <= maxPrice.Value);
-
-            // Filter by garages
-            if (minGarages.HasValue)
-                properties = properties.Where(p => p.PropertyGarages >= minGarages.Value);
-
-            // Filter by pets allowed
-            if (minPets.HasValue)
-                properties = properties.Where(p => p.PropertyPets >= minPets.Value);
+            var unitofwork = await _unitofwork.Properties.GetAvailableFilteredAsync(searchString, propertyType, minBedrooms, maxBedrooms, minBathrooms, maxBathrooms, minPrice, maxPrice, minGarages, minPets);
 
             // Pass current filter values back to the view
             ViewData["SearchString"] = searchString;
@@ -76,25 +39,20 @@ namespace Real_Estate_App.Controllers
             ViewData["MinPets"] = minPets;
 
             // Get distinct property types for the dropdown
-            ViewData["PropertyTypes"] = await _context.Properties
-                .Select(p => p.PropertyType)
-                .Distinct()
-                .OrderBy(t => t)
-                .ToListAsync();
+            ViewData["PropertyTypes"] = await _unitofwork.Properties.GetDistinctPropertyTypesAsync();
 
-            return View(await properties.ToListAsync());
+            return View(unitofwork.ToList());
         }
 
         // GET: Properties/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var property = await _context.Properties
-                .FirstOrDefaultAsync(p => p.PropertyId == id);
+            var property = await _unitofwork.Properties.GetByIdAsync(id);
 
             if (property == null)
             {
@@ -102,94 +60,6 @@ namespace Real_Estate_App.Controllers
             }
 
             return View(property);
-        }
-
-        // GET: Properties/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Properties/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PropertyName,PropertyAddress,PropertyBedrooms,PropertyBathrooms,PropertyPets,PropertyGarages,ExtendedDescription,Price,PropertyType,IsAvailable,NearbySchools,NearbyShops")] Models.Property property)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(property);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(property);
-        }
-
-        // GET: Properties/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var property = await _context.Properties.FindAsync(id);
-            if (property == null)
-            {
-                return NotFound();
-            }
-            return View(property);
-        }
-
-        // POST: Properties/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PropertyId,PropertyName,PropertyAddress,PropertyBedrooms,PropertyBathrooms,PropertyPets,PropertyGarages,ExtendedDescription,Price,PropertyType,IsAvailable,NearbySchools,NearbyShops")] Models.Property property)
-        {
-            if (id != property.PropertyId)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                _context.Update(property);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(property);
-        }
-
-        // GET: Properties/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var property = await _context.Properties
-                .FirstOrDefaultAsync(p => p.PropertyId == id);
-
-            if (property == null)
-            {
-                return NotFound();
-            }
-
-            return View(property);
-        }
-
-        // POST: Properties/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var property = await _context.Properties.FindAsync(id);
-            if (property != null)
-            {
-                _context.Properties.Remove(property);
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
@@ -197,7 +67,7 @@ namespace Real_Estate_App.Controllers
         {
             var userIdClaim = User.FindFirst("UserID")?.Value;
 
-            if (userIdClaim == null)// If no User is logged in TODO: Add a message popup to ask the user to kindly login or register
+            if (userIdClaim == null)
             {
                 TempData["warning"] = "Please log in before booking for any properties";
                 return RedirectToAction("Login","UserAdmin");
@@ -210,8 +80,8 @@ namespace Real_Estate_App.Controllers
                 viewingobj.PropertyID = PropertyID;
                 viewingobj.UserID = userID;
 
-                _context.ViewingSet.Add(viewingobj);
-                await _context.SaveChangesAsync();
+                await _unitofwork.Viewings.AddAsync(viewingobj);
+                await _unitofwork.SaveChangesAsync();
                 TempData["success"] = "Viewing Booked Successfully!";
                 return RedirectToAction("Index");
             }
@@ -240,11 +110,7 @@ namespace Real_Estate_App.Controllers
         {
             var userID = int.Parse(User.FindFirst("UserID")!.Value);
 
-            var propertiesviewed = await _context.ViewingSet
-                .Where(viewing => viewing.UserID == userID)
-                .Include(viewing => viewing.Properties)
-                .OrderBy(viewing => viewing.Viewing_TimeDate)
-                .ToListAsync();
+            var propertiesviewed = await _unitofwork.Viewings.GetByUserIdAsync(userID);
 
             return View(propertiesviewed);
         }

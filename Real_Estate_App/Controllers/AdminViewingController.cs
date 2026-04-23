@@ -4,28 +4,31 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
+using Real_Estate_App.UnitOfWork;
 
 namespace Real_Estate_App.Controllers
 {
     public class AdminViewingController : Controller
     {
         private readonly AppDbContext _context;
-        public AdminViewingController(AppDbContext context)
+        private readonly IUnitOfWork _unitofwork;
+        public AdminViewingController(AppDbContext context, IUnitOfWork unitOfWork )
         {
             _context = context;
+            _unitofwork = unitOfWork;
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var viewings = _context.ViewingSet.Include(viewing => viewing.Properties).Include(users => users.Users).ToList();
+            var viewings = await _unitofwork.Viewings.GetAllWithUserAndPropertyAsync();
             return View(viewings);
         }
 
         [Authorize(Roles = "Admin")]
-        public ActionResult Details(int ID)
+        public async Task<ActionResult> Details(int ID)
         {
-            var viewings = _context.ViewingSet.Include(viewing => viewing.Properties).Include(users => users.Users).FirstOrDefault(viewingID => viewingID.Viewing_ID == ID);
+            var viewings = await _unitofwork.Viewings.GetByIdWithUserAndPropertyAsync(ID);
             return View(viewings);
         }
 
@@ -71,8 +74,8 @@ namespace Real_Estate_App.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.ViewingSet.Add(viewing);
-                _context.SaveChanges();
+                _unitofwork.Viewings.AddAsync(viewing);
+                _unitofwork.SaveChanges();
                 TempData["success"] = "Viewing successfully added as an admin";
                 return RedirectToAction("Index");
             }
@@ -81,13 +84,13 @@ namespace Real_Estate_App.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public ActionResult Edit(int ID)
+        public async Task<ActionResult> Edit(int ID)
         {
             if (ID == 0)
             {
                 return NotFound();
             }
-            var viewing = _context.ViewingSet.Include(user => user.Users).Include(property => property.Properties).FirstOrDefault(viewings => viewings.Viewing_ID == ID);
+            var viewing = await _unitofwork.Viewings.GetByIdWithUserAndPropertyAsync(ID);
             if (viewing == null)
             {
                 return NotFound();
@@ -101,21 +104,21 @@ namespace Real_Estate_App.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Viewing viewing)
         {
-            _context.ViewingSet.Update(viewing);
-            _context.SaveChanges();
+            _unitofwork.Viewings.Update(viewing);
+            _unitofwork.SaveChanges();
             TempData["success"] = "Viewing successfully edited as an admin";
             return RedirectToAction("Index");
         }
 
         [Authorize(Roles = "Admin")]
-        public ActionResult Delete(int ID)
+        public async Task<ActionResult> Delete(int ID)
         {
             if (ID == 0)
             {
                 return NotFound();
             }
 
-            var viewing = _context.ViewingSet.Include(user => user.Users).Include(property => property.Properties).FirstOrDefault(viewings => viewings.Viewing_ID == ID);
+            var viewing = await _unitofwork.Viewings.GetByIdWithUserAndPropertyAsync(ID);
             if (viewing == null)
             {
                 return NotFound();
@@ -138,9 +141,9 @@ namespace Real_Estate_App.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.ViewingSet.Remove(viewingID);
-                _context.SaveChanges(true);
-                TempData["success"] = "viewing successfully deleted as an admin";
+                _unitofwork.Viewings.Remove(viewingID);
+                _unitofwork.SaveChanges();
+                TempData["success"] = "Viewing successfully deleted as an admin";
                 return RedirectToAction("Index");
             }
             return View();

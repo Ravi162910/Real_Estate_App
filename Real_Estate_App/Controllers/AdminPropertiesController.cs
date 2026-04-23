@@ -4,62 +4,26 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
+using Real_Estate_App.UnitOfWork;
 
 namespace Real_Estate_App.Controllers
 {
     public class AdminPropertiesController : Controller
     {
         public readonly AppDbContext _appDbContext;
-        public AdminPropertiesController(AppDbContext appDbContext) 
+        private readonly IUnitOfWork _unitofwork;
+        public AdminPropertiesController(AppDbContext appDbContext, IUnitOfWork unitOfWork) 
         {
             _appDbContext = appDbContext;
+            _unitofwork = unitOfWork;
         }
 
         public async Task<IActionResult> Index(string? searchString, string? propertyType,
                     int? minBedrooms, int? maxBedrooms, int? minBathrooms, int? maxBathrooms,
                     decimal? minPrice, decimal? maxPrice, int? minGarages, int? minPets)
         {
-            var properties = _appDbContext.Properties.Where(p => p.IsAvailable);
 
-            // Search by name or address
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                properties = properties.Where(p =>
-                    p.PropertyName.Contains(searchString) ||
-                    p.PropertyAddress.Contains(searchString));
-            }
-
-            // Filter by property type
-            if (!string.IsNullOrEmpty(propertyType))
-            {
-                properties = properties.Where(p => p.PropertyType == propertyType);
-            }
-
-            // Filter by bedrooms
-            if (minBedrooms.HasValue)
-                properties = properties.Where(p => p.PropertyBedrooms >= minBedrooms.Value);
-            if (maxBedrooms.HasValue)
-                properties = properties.Where(p => p.PropertyBedrooms <= maxBedrooms.Value);
-
-            // Filter by bathrooms
-            if (minBathrooms.HasValue)
-                properties = properties.Where(p => p.PropertyBathrooms >= minBathrooms.Value);
-            if (maxBathrooms.HasValue)
-                properties = properties.Where(p => p.PropertyBathrooms <= maxBathrooms.Value);
-
-            // Filter by price
-            if (minPrice.HasValue)
-                properties = properties.Where(p => p.Price >= minPrice.Value);
-            if (maxPrice.HasValue)
-                properties = properties.Where(p => p.Price <= maxPrice.Value);
-
-            // Filter by garages
-            if (minGarages.HasValue)
-                properties = properties.Where(p => p.PropertyGarages >= minGarages.Value);
-
-            // Filter by pets allowed
-            if (minPets.HasValue)
-                properties = properties.Where(p => p.PropertyPets >= minPets.Value);
+            var unitofwork = await _unitofwork.Properties.GetAvailableFilteredAsync(searchString, propertyType, minBedrooms, maxBedrooms, minBathrooms, maxBathrooms, minPrice, maxPrice, minGarages, minPets);
 
             // Pass current filter values back to the view
             ViewData["SearchString"] = searchString;
@@ -74,18 +38,14 @@ namespace Real_Estate_App.Controllers
             ViewData["MinPets"] = minPets;
 
             // Get distinct property types for the dropdown
-            ViewData["PropertyTypes"] = await _appDbContext.Properties
-                .Select(p => p.PropertyType)
-                .Distinct()
-                .OrderBy(t => t)
-                .ToListAsync();
+            ViewData["PropertyTypes"] = await _unitofwork.Properties.GetDistinctPropertyTypesAsync();
 
-            return View(await properties.ToListAsync());
+            return View(unitofwork.ToList());
         }
 
-        public IActionResult Details(int id) 
+        public async Task<IActionResult> Details(int id) 
         {
-            var property = _appDbContext.Properties.FirstOrDefault(property => property.PropertyId == id);
+            var property = await _unitofwork.Properties.GetByIdAsync(id);
             if (property == null) 
             {
                 return NotFound();
@@ -104,8 +64,8 @@ namespace Real_Estate_App.Controllers
         {
             if (ModelState.IsValid) 
             {
-                _appDbContext.Properties.Add(property);
-                _appDbContext.SaveChanges();
+                _unitofwork.Properties.AddAsync(property);
+                _unitofwork.SaveChanges();
                 TempData["success"] = "Property successfully added as an admin";
                 return RedirectToAction("Index");
             }
@@ -113,13 +73,13 @@ namespace Real_Estate_App.Controllers
         }
 
 
-        public ActionResult Edit(int ID)
+        public async Task<ActionResult> Edit(int ID)
         {
             if (ID == 0)
             {
                 return NotFound();
             }
-            var propertyId = _appDbContext.Properties.Find(ID);
+            var propertyId = await _unitofwork.Properties.GetByIdAsync(ID);
             if(propertyId == null)
             {
                 return NotFound();
@@ -134,8 +94,8 @@ namespace Real_Estate_App.Controllers
         {
             if (ModelState.IsValid) 
             {
-                _appDbContext.Properties.Update(property);
-                _appDbContext.SaveChanges();
+                _unitofwork.Properties.Update(property);
+                _unitofwork.SaveChanges();
                 TempData["success"] = "Property successfully edited as an admin";
                 return RedirectToAction("Index");
             }
@@ -143,14 +103,14 @@ namespace Real_Estate_App.Controllers
         }
 
 
-        public ActionResult Delete(int? ID)
+        public async Task<ActionResult> Delete(int ID)
         {
             if (ID == null || ID == 0) 
             {
                 return NotFound();
             }
 
-            var propertyID = _appDbContext.Properties.Find(ID);
+            var propertyID = await _unitofwork.Properties.GetByIdAsync(ID);
             if (propertyID == null) 
             {
                 return NotFound();
@@ -162,15 +122,15 @@ namespace Real_Estate_App.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirm(int ID, Models.Property property)
+        public async Task<ActionResult> DeleteConfirm(int ID, Models.Property property)
         {
-            var userID = _appDbContext.Properties.Find(ID); 
+            var userID = await _unitofwork.Properties.GetByIdAsync(ID); 
             if (userID == null) 
             {
                 return NotFound();
             }
-            _appDbContext.Properties.Remove(userID);
-            _appDbContext.SaveChanges(true);
+            _unitofwork.Properties.Remove(userID);
+            _unitofwork.SaveChanges();
             TempData["success"] = "Property successfully deleted as an admin";
             return RedirectToAction("Index");
         }

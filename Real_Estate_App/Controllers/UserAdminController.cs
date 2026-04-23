@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Real_Estate_App.UnitOfWork;
+using Real_Estate_App.Repositories;
 
 namespace Real_Estate_App.Controllers
 {
@@ -20,11 +22,13 @@ namespace Real_Estate_App.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IPasswordHasher<User_Data> _passwordHasher;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UserAdminController(AppDbContext context, IPasswordHasher<User_Data> passwordHasher)
+        public UserAdminController(AppDbContext context, IPasswordHasher<User_Data> passwordHasher, IUnitOfWork unitOfWork)
         {
             _context = context;
             _passwordHasher = passwordHasher;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Registration()
@@ -50,8 +54,10 @@ namespace Real_Estate_App.Controllers
 
                 try
                 {
-                    _context.UsersandAdminsset.Add(user_Data);
-                    _context.SaveChanges();
+                    _unitOfWork.Users.AddAsync(user_Data);
+                    _unitOfWork.SaveChanges();
+                    //_context.UsersandAdminsset.Add(user_Data);
+                    //_context.SaveChanges();
                     ModelState.Clear();
                     TempData["success"] = "Account Registered Sucessfully! Please Log in...";
                     return RedirectToAction("Login","UserAdmin");
@@ -115,7 +121,7 @@ namespace Real_Estate_App.Controllers
             if (verifyResult == PasswordVerificationResult.SuccessRehashNeeded)
             {
                 useroradmin.Password = _passwordHasher.HashPassword(useroradmin, loginViewModelobj.Password);
-                await _context.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync();
             }
 
             // Build claims based on IsAdmin flag instead of hardcoded username comparison

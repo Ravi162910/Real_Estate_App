@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
+using Real_Estate_App.UnitOfWork;
 
 namespace Real_Estate_App.Controllers
 {
@@ -11,28 +12,30 @@ namespace Real_Estate_App.Controllers
     {
         private readonly AppDbContext _userContext;
         private readonly IPasswordHasher<User_Data> _passwordHasher;
-        public AdminUsersDashboardController(AppDbContext usersContext, IPasswordHasher<User_Data> passwordHasher)
+        private readonly IUnitOfWork _unitOfWork;
+        public AdminUsersDashboardController(AppDbContext usersContext, IPasswordHasher<User_Data> passwordHasher, IUnitOfWork unitOfWork)
         {
             _userContext = usersContext;
             _passwordHasher = passwordHasher;
+            _unitOfWork = unitOfWork;
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var users = _userContext.UsersandAdminsset.ToList();
+            var users = await _unitOfWork.Users.GetAllAsync();
             return View(users);
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Details(int ID) 
+        public async Task<IActionResult> Details(int ID) 
         {
             if (ID == 0) 
             {
                 return NotFound();
             }
 
-            var userID = _userContext.UsersandAdminsset.First(user => user.UserID == ID);
+            var userID = await _unitOfWork.Users.GetByIdAsync(ID);
             return View(userID);
         }
 
@@ -45,19 +48,19 @@ namespace Real_Estate_App.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(int ID, User_Data users) 
+        public async Task<IActionResult> Create(int ID, User_Data users) 
         {
 
             users.Password = _passwordHasher.HashPassword(users, users.Password);
 
-            var useemailrobj = _userContext.UsersandAdminsset.Any(user => user.Email == users.Email && user.UserID != ID);
+            var useemailrobj = await _unitOfWork.Users.EmailExistsAsync(users.Email);
             if (useemailrobj)
             {
                 TempData["error"] = "Email already exists.";
                 return View(users);
             }
 
-            var usernameobj = _userContext.UsersandAdminsset.Any(user => user.UserName == users.UserName && user.UserID != ID);
+            var usernameobj = await _unitOfWork.Users.UsernameExistsAsync(users.UserName);
 
             if (usernameobj)
             {
@@ -67,8 +70,8 @@ namespace Real_Estate_App.Controllers
 
             if (ModelState.IsValid) 
             {
-                _userContext.UsersandAdminsset.Add(users);
-                _userContext.SaveChanges();
+                await _unitOfWork.Users.AddAsync(users);
+                await _unitOfWork.SaveChangesAsync();
                 TempData["success"] = "User successfully added as an admin";
                 return RedirectToAction("Index");
             }
@@ -76,9 +79,9 @@ namespace Real_Estate_App.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public IActionResult Edit(int id) 
+        public async Task<IActionResult> Edit(int id) 
         {
-            var Userobj = _userContext.UsersandAdminsset.Find(id);
+            var Userobj = await _unitOfWork.Users.GetByIdAsync(id);
             if (Userobj == null) 
             {
                 return NotFound();
@@ -89,9 +92,9 @@ namespace Real_Estate_App.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, User_Data users) 
+        public async Task<IActionResult> Edit(int id, User_Data users) 
         {
-            var userexists = _userContext.UsersandAdminsset.Find(id);
+            var userexists = await _unitOfWork.Users.GetByIdAsync(id);
 
             if (userexists == null) 
             {
@@ -99,14 +102,14 @@ namespace Real_Estate_App.Controllers
             }
 
 
-            var userobj = _userContext.UsersandAdminsset.Any(user => user.Email == users.Email && user.UserID != id);
+            var userobj = await _unitOfWork.Users.UsernameExistsAsync(users.UserName, id);
             if (userobj)
             {
                 TempData["error"] = "Email already exists.";
                 return View(users);
             }
 
-            var usernameobj = _userContext.UsersandAdminsset.Any(user => user.UserName == users.UserName && user.UserID != id);
+            var usernameobj = await _unitOfWork.Users.EmailExistsAsync(users.Email, id);
 
             if (usernameobj)
             {
@@ -119,8 +122,8 @@ namespace Real_Estate_App.Controllers
             userexists.Email = users.Email;
             userexists.UserName = users.UserName;
 
-            _userContext.UsersandAdminsset.Update(userexists);
-            _userContext.SaveChanges();
+            _unitOfWork.Users.Update(userexists);
+            _unitOfWork.SaveChanges();
             TempData["success"] = "User successfully edited as an admin";
             return RedirectToAction("Index");
         }
@@ -134,9 +137,9 @@ namespace Real_Estate_App.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirm(int id, User_Data users) 
+        public async Task<IActionResult> DeleteConfirm(int id, User_Data users) 
         {
-            var UsersID = _userContext.UsersandAdminsset.Find(id);
+            var UsersID = await _unitOfWork.Users.GetByIdAsync(id);
 
             if (UsersID == null)
             {
@@ -144,8 +147,8 @@ namespace Real_Estate_App.Controllers
             }
             else 
             {
-                _userContext.UsersandAdminsset.Remove(UsersID);
-                _userContext.SaveChanges(true);
+                _unitOfWork.Users.Remove(UsersID);
+                _unitOfWork.SaveChanges();
                 TempData["success"] = "User successfully deleted as an admin";
                 return RedirectToAction("Index");
             }
