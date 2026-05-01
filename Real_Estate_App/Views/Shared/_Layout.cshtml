@@ -37,12 +37,13 @@
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
+    @await Html.PartialAsync("_Chatbotpartial")
     <footer class="border-top footer text-muted">
         @* <div class="container">
             &copy; 2026 - Real_Estate_App - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
