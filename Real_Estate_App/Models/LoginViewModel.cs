@@ -13,6 +13,7 @@ namespace Real_Estate_App.Models
 
         [Required(ErrorMessage = "Please fill out this field")]
         [MaxLength(25, ErrorMessage = "25 characters are allowed for the Password")]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
     }
 }
