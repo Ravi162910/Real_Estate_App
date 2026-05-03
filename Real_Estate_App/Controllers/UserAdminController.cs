@@ -128,9 +128,33 @@ namespace Real_Estate_App.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, useroradmin.IsAdmin ? useroradmin.UserName : useroradmin.First_Name),
-                new Claim(ClaimTypes.Role, useroradmin.IsAdmin ? "Admin" : "User"),
                 new Claim("UserID", useroradmin.UserID!.Value.ToString())
             };
+
+            if (useroradmin.IsAdmin)
+            {
+                // Legacy admins (no AdminRole set) and Super admins get every role
+                // so existing admin accounts keep full access.
+                var role = string.IsNullOrWhiteSpace(useroradmin.AdminRole) ? "Super" : useroradmin.AdminRole;
+                if (role == "Super")
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                    claims.Add(new Claim(ClaimTypes.Role, "PropertyAdmin"));
+                    claims.Add(new Claim(ClaimTypes.Role, "TransactionAdmin"));
+                }
+                else if (role == "Property")
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, "PropertyAdmin"));
+                }
+                else if (role == "Transaction")
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, "TransactionAdmin"));
+                }
+            }
+            else
+            {
+                claims.Add(new Claim(ClaimTypes.Role, "User"));
+            }
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
@@ -147,11 +171,15 @@ namespace Real_Estate_App.Controllers
 
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,PropertyAdmin,TransactionAdmin")]
         public IActionResult LoggedinAdminPage()
         {
-            return RedirectToAction("Index", "AdminProperties");
-
+            // Route each admin role to the dashboard they actually have access to.
+            if (User.IsInRole("Admin") || User.IsInRole("PropertyAdmin"))
+            {
+                return RedirectToAction("Index", "AdminProperties");
+            }
+            return RedirectToAction("Index", "AdminTransactions");
         }
 
         [HttpPost]

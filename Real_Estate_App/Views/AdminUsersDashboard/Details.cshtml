@@ -27,6 +27,18 @@
         <label>Username:</label>
         <strong>@Model.UserName</strong>
     </div>
+    <div class="list-group-item">
+        <label>Role:</label>
+        @if (Model.IsAdmin)
+        {
+            var roleLabel = string.IsNullOrWhiteSpace(Model.AdminRole) ? "Super" : Model.AdminRole;
+            <strong>@roleLabel Admin</strong>
+        }
+        else
+        {
+            <strong>Regular User</strong>
+        }
+    </div>
 </div>
 
 

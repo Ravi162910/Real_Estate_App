@@ -53,30 +53,50 @@ using (var scope = app.Services.CreateScope()) //Important for Seeding Database 
             await db.Database.EnsureCreatedAsync();
         }
 
-        if (await db.Database.CanConnectAsync() && !await db.UsersandAdminsset.AnyAsync(u => u.IsAdmin))
+        if (await db.Database.CanConnectAsync())
         {
-            var existingByName = await db.UsersandAdminsset
-                .FirstOrDefaultAsync(u => u.UserName == "AdminUsername");
+            if (!await db.UsersandAdminsset.AnyAsync(u => u.IsAdmin))
+            {
+                var existingByName = await db.UsersandAdminsset
+                    .FirstOrDefaultAsync(u => u.UserName == "AdminUsername");
 
-            if (existingByName != null)
-            {
-                existingByName.IsAdmin = true;
-                existingByName.Password = hasher.HashPassword(existingByName, "AdminPassword");
-            }
-            else
-            {
-                var admin = new User_Data
+                if (existingByName != null)
                 {
-                    First_Name = "Admin",
-                    Last_Name = "User",
-                    Email = "admin@realestate.local",
-                    UserName = "AdminUsername",
-                    IsAdmin = true,
-                };
-                admin.Password = hasher.HashPassword(admin, "AdminPassword");
-                db.UsersandAdminsset.Add(admin);
+                    existingByName.IsAdmin = true;
+                    existingByName.AdminRole = "Super";
+                    existingByName.Password = hasher.HashPassword(existingByName, "AdminPassword");
+                }
+                else
+                {
+                    var admin = new User_Data
+                    {
+                        First_Name = "Admin",
+                        Last_Name = "User",
+                        Email = "admin@realestate.local",
+                        UserName = "AdminUsername",
+                        IsAdmin = true,
+                        AdminRole = "Super",
+                    };
+                    admin.Password = hasher.HashPassword(admin, "AdminPassword");
+                    db.UsersandAdminsset.Add(admin);
+                }
+                await db.SaveChangesAsync();
             }
-            await db.SaveChangesAsync();
+
+            // Backfill: legacy admin rows pre-date the AdminRole column and
+            // would otherwise show as "no role" in the dashboard. Treat them
+            // as Super to match how the login claim logic falls back today.
+            var legacyAdmins = await db.UsersandAdminsset
+                .Where(u => u.IsAdmin && (u.AdminRole == null || u.AdminRole == ""))
+                .ToListAsync();
+            if (legacyAdmins.Count > 0)
+            {
+                foreach (var legacy in legacyAdmins)
+                {
+                    legacy.AdminRole = "Super";
+                }
+                await db.SaveChangesAsync();
+            }
         }
     }
     catch (DbException)

@@ -46,8 +46,12 @@ namespace Real_Estate_App.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int ID, User_Data users) 
+        public async Task<IActionResult> Create(int ID, User_Data users)
         {
+            // Single Account Type dropdown is the source of truth — IsAdmin
+            // is derived so the two fields can never disagree.
+            users.AdminRole = string.IsNullOrWhiteSpace(users.AdminRole) ? null : users.AdminRole;
+            users.IsAdmin = users.AdminRole != null;
 
             users.Password = _passwordHasher.HashPassword(users, users.Password);
 
@@ -118,6 +122,8 @@ namespace Real_Estate_App.Controllers
             userexists.Last_Name = users.Last_Name;
             userexists.Email = users.Email;
             userexists.UserName = users.UserName;
+            userexists.AdminRole = string.IsNullOrWhiteSpace(users.AdminRole) ? null : users.AdminRole;
+            userexists.IsAdmin = userexists.AdminRole != null;
 
             _unitOfWork.Users.Update(userexists);
             _unitOfWork.SaveChanges();

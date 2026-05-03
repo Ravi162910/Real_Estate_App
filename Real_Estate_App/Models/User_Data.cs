@@ -30,9 +30,18 @@ namespace Real_Estate_App.Models
 
         [Required]
         [MaxLength(255)]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
 
         public bool IsAdmin { get; set; }
+
+        // "Super" (full access), "Property" (manages properties + viewings),
+        // "Transaction" (reviews purchase queue). Null/empty for non-admins.
+        // Why: tutor wants role-separated admins so a transaction reviewer
+        // can't also edit listings.
+        [MaxLength(20)]
+        [Display(Name = "Admin Role")]
+        public string? AdminRole { get; set; }
 
 
         public List<Viewing>? Viewings_list { get; set; }// One
