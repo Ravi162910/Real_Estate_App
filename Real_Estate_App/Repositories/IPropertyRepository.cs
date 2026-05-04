@@ -14,7 +14,8 @@ namespace Real_Estate_App.Repositories
             decimal? minPrice,
             decimal? maxPrice,
             int? minGarages,
-            int? minPets);
+            int? minPets,
+            bool availableOnly = true);
 
         Task<IEnumerable<string>> GetDistinctPropertyTypesAsync();
     }

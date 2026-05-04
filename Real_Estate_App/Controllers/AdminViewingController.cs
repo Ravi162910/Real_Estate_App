@@ -18,28 +18,28 @@ namespace Real_Estate_App.Controllers
             _unitofwork = unitOfWork;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,PropertyAdmin")]
         public async Task<IActionResult> Index()
         {
             var viewings = await _unitofwork.Viewings.GetAllWithUserAndPropertyAsync();
             return View(viewings);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,PropertyAdmin")]
         public async Task<ActionResult> Details(int ID)
         {
             var viewings = await _unitofwork.Viewings.GetByIdWithUserAndPropertyAsync(ID);
             return View(viewings);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,PropertyAdmin")]
         public ActionResult Create()
         {
             return View();
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,PropertyAdmin")]
         public ActionResult Create(int propertyID, int userID)
         {
             var properties = _context.Properties.Select(property => new { PropertyID = property.PropertyId, PropertyName = property.PropertyName }).ToList();
@@ -57,7 +57,7 @@ namespace Real_Estate_App.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,PropertyAdmin")]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Viewing viewing)
         {
@@ -83,7 +83,7 @@ namespace Real_Estate_App.Controllers
             return View(viewing);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,PropertyAdmin")]
         public async Task<ActionResult> Edit(int ID)
         {
             if (ID == 0)
@@ -100,7 +100,7 @@ namespace Real_Estate_App.Controllers
 
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,PropertyAdmin")]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Viewing viewing)
         {
@@ -110,7 +110,7 @@ namespace Real_Estate_App.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,PropertyAdmin")]
         public async Task<ActionResult> Delete(int ID)
         {
             if (ID == 0)
