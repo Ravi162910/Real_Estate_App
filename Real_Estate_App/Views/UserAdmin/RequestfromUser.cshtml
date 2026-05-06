@@ -15,10 +15,12 @@
     <div class="mb-3">
         <label asp-for="Property_Name"></label>
         <input asp-for="@Model.Property_Name" class="form-control border-3 shadow" type="text" />
+        <span asp-validation-for="Property_Name" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Property_Address"></label>
         <input asp-for="@Model.Property_Address" class="form-control border-3 shadow" type="text" />
+        <span asp-validation-for="Property_Address" class="text-danger"></span>
     </div>    
     <div class="row">
     <div class="col-md-3 mb-3">
@@ -45,10 +47,12 @@
     <div class="mb-3">
         <label asp-for="Property_Description"></label>
         <textarea asp-for="@Model.Property_Description" class="form-control border-3 shadow" rows="4" type="text"></textarea>
+        <span asp-validation-for="Property_Description" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Property_Price"></label>
         <input asp-for="@Model.Property_Price" class="form-control border-3 shadow" type="number" />
+        <span asp-validation-for="Property_Price" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Property_Type" class="form-label"></label>
@@ -60,24 +64,25 @@
             <option value="Townhouse">Townhouse</option>
             <option value="Studio">Studio</option>
         </select>
-        @* <span asp-validation-for="PropertyType" class="text-danger"></span> *@
+        <span asp-validation-for="Property_Type" class="text-danger"></span>
     </div>
 
     <div class="mb-3">
         <label asp-for="Request_NearbySchools"></label>
         <input asp-for="@Model.Request_NearbySchools" class="form-control border-3 shadow" type="text" />
+        <span asp-validation-for="Request_NearbySchools" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Request_NearbyShops"></label>
         <input asp-for="@Model.Request_NearbyShops" class="form-control border-3 shadow" type="text" />
+        <span asp-validation-for="Request_NearbyShops" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary mt-2">Submit this request</button>
 </form>
-@* Need to add validation! *@
 
-@* <div class="mb-3">
-    <label asp-for="PropertyName"></label>
-    <input asp-for="PropertyName" class="form-control border-3 shadow" type="text" />
-    <span asp-validation-for="PropertyName" class="text-danger"></span>
-</div> *@
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
