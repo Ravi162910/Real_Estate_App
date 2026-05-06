@@ -13,6 +13,8 @@ namespace Real_Estate_App.UnitOfWork
         public IViewingRepository Viewings { get; }
         public IUser_DataRepository Users { get; }
 
+        public IPropertyRequestRepository PropertyRequest { get; }
+
         public UnitOfWork(AppDbContext context)
         {
             _context = context;
@@ -20,6 +22,7 @@ namespace Real_Estate_App.UnitOfWork
             Transactions = new TransactionRepository(context);
             Viewings = new ViewingRepository(context);
             Users = new User_DataRepository(context);
+            PropertyRequest = new PropertyRequestRepository(context);
         }
 
         public Task<int> SaveChangesAsync() => _context.SaveChangesAsync();

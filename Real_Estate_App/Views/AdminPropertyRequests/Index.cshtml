@@ -1,0 +1,89 @@
+﻿@model List<PropertyRequest>
+
+
+<div class="card border-2 mt-4">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Admin Property Requests Dashboard</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@foreach (var requests in Model)
+{
+        <div class="list-group shadow mb-sm-4">
+            <div class="list-group-item">
+                <label>Property Name:</label>
+                <strong asp-for="PropertyName">@requests.Property_Name</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Address:</label>
+                <strong asp-for="PropertyAddress">@requests.Property_Address</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Bedrooms:</label>
+                <strong asp-for="PropertyBedrooms">@requests.Property_Bedrooms</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Bathrooms: </label>
+                <strong asp-for="PropertyBathrooms">@requests.Property_Bathrooms</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Pets</label>
+                <strong asp-for="PropertyPets"> @requests.Property_Pets</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Garages:</label>
+                <strong asp-for="PropertyGarages"> @requests.Property_Garages</strong>
+            </div>
+
+            <div class="list-group-item">
+                <strong>Property Description:</strong>
+                <p asp-for="ExtendedDescription" class="form-label"> @requests.Property_Description</p>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Price: </label>
+                <strong asp-for="Price">$@requests.Property_Price</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Type: </label>
+                <strong asp-for="PropertyType">@requests.Property_Type</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Nearby School:</label>
+                <strong asp-for="NearbySchools"> @requests.Request_NearbySchools</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Nearby Shops:</label>
+                <strong asp-for="NearbyShops"> @requests.Request_NearbyShops</strong>
+            </div>
+        </div>
+
+        <form asp-action="AdminApproveRequest" method="post" asp-route-id="@requests.PropertyRequestID">
+            <input asp-for="@requests.PropertyRequestID" type="hidden" />
+            <button type="submit" class="btn btn-success">Add as a property (Approve)</button>
+            <form asp-action="AdminRejectRequest" method="post" asp-route-id="@requests.PropertyRequestID">
+                <input asp-for="@requests.PropertyRequestID" type="hidden" />
+                <button type="submit" class="btn btn-danger">Reject</button>
+            </form>
+        </form>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-danger mt-3">
+        <i class="bi bi-x"> No requests available </i>
+    </div>
+}

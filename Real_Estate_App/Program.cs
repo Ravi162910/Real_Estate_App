@@ -78,6 +78,34 @@ using (var scope = app.Services.CreateScope()) //Important for Seeding Database 
             }
             await db.SaveChangesAsync();
         }
+
+        if (!await db.UsersandAdminsset.AnyAsync(u => u.IsAgent)) 
+        {
+            var anyagents = await db.UsersandAdminsset.FirstOrDefaultAsync(u => u.UserName == "AgentUsername");
+
+            if (anyagents != null)
+            {
+                anyagents.Password = hasher.HashPassword(anyagents, anyagents.Password);
+                anyagents.IsAgent = true;
+            }
+            else 
+            {
+                var seededagent = new User_Data
+                {
+                    First_Name = "Agent",
+                    Last_Name = "User",
+                    Email = "agent@gmail.com",
+                    UserName = "AgentUsername",
+                    IsAdmin = false,
+                    IsAgent = true
+                };
+
+                seededagent.Password = hasher.HashPassword(anyagents, "AgentPassword");
+                db.UsersandAdminsset.Add(seededagent);
+
+            }
+            await db.SaveChangesAsync();
+        }
     }
     catch (DbException)
     {

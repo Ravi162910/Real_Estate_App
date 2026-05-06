@@ -33,6 +33,7 @@ namespace Real_Estate_App.Models
         public string Password { get; set; }
 
         public bool IsAdmin { get; set; }
+        public bool IsAgent { get; set; }
 
 
         public List<Viewing>? Viewings_list { get; set; }// One

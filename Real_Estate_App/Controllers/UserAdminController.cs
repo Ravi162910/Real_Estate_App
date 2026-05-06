@@ -49,6 +49,7 @@ namespace Real_Estate_App.Controllers
                     Email = registerViewModelobj.Email,
                     UserName = registerViewModelobj.UserName,
                     IsAdmin = false,
+                    IsAgent = false,
                 };
                 user_Data.Password = _passwordHasher.HashPassword(user_Data, registerViewModelobj.Password);
 
@@ -125,11 +126,26 @@ namespace Real_Estate_App.Controllers
             }
 
             // Build claims based on IsAdmin flag instead of hardcoded username comparison
+            string claimrole;
+
+            if (useroradmin.IsAdmin)
+            {
+                claimrole = "Admin";
+            }
+            else if (useroradmin.IsAgent)
+            {
+                claimrole = "Agent";
+            }
+            else 
+            {
+                claimrole = "User";
+            }
+
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, useroradmin.IsAdmin ? useroradmin.UserName : useroradmin.First_Name),
-                new Claim(ClaimTypes.Role, useroradmin.IsAdmin ? "Admin" : "User"),
-                new Claim("UserID", useroradmin.UserID!.Value.ToString())
+                new Claim(ClaimTypes.Name, useroradmin.UserName),
+                new Claim(ClaimTypes.Role, claimrole),
+                new Claim("UserID", useroradmin.UserID.Value!.ToString())
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -137,7 +153,20 @@ namespace Real_Estate_App.Controllers
 
             TempData["success"] = "Login Successfully!";
 
-            return RedirectToAction(useroradmin.IsAdmin ? "LoggedinAdminPage" : "LoggedinUsersPage");
+
+
+            if (useroradmin.IsAdmin)
+            {
+                return RedirectToAction("LoggedinAdminPage");
+            }
+            else if (useroradmin.IsAgent)
+            {
+                return RedirectToAction("AgentsPage");
+            }
+            else
+            {
+                return RedirectToAction("LoggedinUsersPage");
+            }
         }
 
         [Authorize(Roles = "User")]
@@ -163,5 +192,82 @@ namespace Real_Estate_App.Controllers
             TempData["success"] = "Log Out Sucessfully!";
             return RedirectToAction("Login");
         }
+
+        [Authorize(Roles = "Agent")]
+        public IActionResult AgentsPage() 
+        {
+            var imcomingrequest = _unitOfWork.PropertyRequest.GetAll().Where(request => request.Requeststatus == "PendingAgent").Include(user => user.User).ToList();
+
+            return View(imcomingrequest);
+        }
+
+        public IActionResult RequestfromUser() 
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> RequestfromUser(PropertyRequest propertyRequestobj)
+        {
+            propertyRequestobj.Requeststatus = "PendingAgent";
+            propertyRequestobj.Requestcreatedat = DateTime.Now;
+
+            var User_ID = int.Parse(User.FindFirst("UserID").Value);
+            propertyRequestobj.UserID = User_ID;
+
+            await _unitOfWork.PropertyRequest.AddAsync(propertyRequestobj);
+            await _unitOfWork.SaveChangesAsync();
+
+            TempData["success"] = "Request successfully made, Processing your request...";
+
+            return RedirectToAction("LoggedinUsersPage");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Agent")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgentApproveRequest(int ID) 
+        {
+            var request = await _unitOfWork.PropertyRequest.GetByIdAsync(ID);
+
+            if (request == null)
+            {
+                return NotFound();
+            }
+
+            request.Requeststatus = "AgentAccepted";
+
+            _unitOfWork.PropertyRequest.Update(request);
+            await _unitOfWork.SaveChangesAsync();
+
+            TempData["success"] = "Request successfully accepted by Agent";
+
+            return RedirectToAction("AgentsPage");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Agent")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgentRejectRequest(int ID) 
+        {
+            var request = await _unitOfWork.PropertyRequest.GetByIdAsync(ID);
+
+            if (request == null)
+            {
+                return NotFound();
+            }
+
+            request.Requeststatus = "AgentRejected";
+
+            _unitOfWork.PropertyRequest.Update(request);
+            await _unitOfWork.SaveChangesAsync();
+
+            TempData["success"] = "Request successfully rejected by Agent";
+
+            return RedirectToAction("AgentsPage");
+        }
+
     }
 }

@@ -17,6 +17,8 @@ namespace Real_Estate_App.Data
 
         public DbSet<User_Data> UsersandAdminsset { get; set; }
 
+        public DbSet<PropertyRequest> PropertyRequestsSet { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -25,6 +27,11 @@ namespace Real_Estate_App.Data
             {
                 entity.HasKey(p => p.PropertyId);
                 entity.Property(p => p.Price).HasColumnType("decimal(18,2)");
+            });
+            modelBuilder.Entity<PropertyRequest>(entity =>
+            {
+                entity.HasKey(p => p.PropertyRequestID);
+                entity.Property(p => p.Property_Price).HasColumnType("decimal(18,2)");
             });
 
             modelBuilder.Entity<Transaction>(entity =>
@@ -35,6 +42,11 @@ namespace Real_Estate_App.Data
                       .WithMany()
                       .HasForeignKey(t => t.PropertyId);
             });
+
+            modelBuilder.Entity<PropertyRequest>()
+                .HasOne(request => request.User)
+                .WithMany()
+                .HasForeignKey(request => request.UserID);
 
             modelBuilder.Entity<Viewing>()
                 .HasOne(viewing => viewing.Users)
