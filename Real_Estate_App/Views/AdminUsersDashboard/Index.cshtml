@@ -26,7 +26,18 @@ else
             <div class="row g-0">
                 <div class="col-md-8">
                     <div class="card-body">
-                        <h5 class="card-title">@users.First_Name, @users.Last_Name</h5>
+                        <h5 class="card-title">
+                            @users.First_Name, @users.Last_Name
+                            @if (users.IsAdmin)
+                            {
+                                var roleLabel = string.IsNullOrWhiteSpace(users.AdminRole) ? "Super" : users.AdminRole;
+                                <span class="badge bg-primary ms-2">@roleLabel Admin</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary ms-2">User</span>
+                            }
+                        </h5>
                         <p class="card-text">@users.UserName</p>
                         <p class="card-text">@users.Email</p>
                         <a asp-action="Edit" asp-route-id="@users.UserID" class="btn btn-sm btn-primary"><i class="bi bi-pen"></i> Edit</a>

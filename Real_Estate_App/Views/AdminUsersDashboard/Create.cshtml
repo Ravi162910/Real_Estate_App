@@ -34,8 +34,19 @@
     </div>
     <div class="mb-3">
         <label asp-for="Password"></label>
-        <input asp-for="Password" class="form-control border-3 shadow" type="text" />
+        <input asp-for="Password" class="form-control border-3 shadow" type="password" />
         <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="AdminRole" class="form-label">Account Type</label>
+        <select asp-for="AdminRole" class="form-select border-3 shadow">
+            <option value="">Regular User</option>
+            <option value="Super">Super Admin (full access)</option>
+            <option value="Property">Property Admin (properties + viewings)</option>
+            <option value="Transaction">Transaction Admin (purchase approvals)</option>
+        </select>
+        <small class="text-muted d-block">Picking any admin role grants admin access automatically.</small>
+        <span asp-validation-for="AdminRole" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-primary mt-3">
         <i class="bi bi-plus"></i> Create

@@ -18,9 +18,16 @@ namespace Real_Estate_App.Repositories
             decimal? minPrice,
             decimal? maxPrice,
             int? minGarages,
-            int? minPets)
+            int? minPets,
+            bool availableOnly = true)
         {
-            var query = _dbSet.Where(p => p.IsAvailable);
+            // Admin views pass availableOnly=false so they can still see and edit
+            // properties they have marked as unavailable.
+            IQueryable<Property> query = _dbSet;
+            if (availableOnly)
+            {
+                query = query.Where(p => p.IsAvailable);
+            }
 
             if (!string.IsNullOrEmpty(searchString))
             {

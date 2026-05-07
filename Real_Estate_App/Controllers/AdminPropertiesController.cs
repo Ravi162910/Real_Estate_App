@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -8,6 +9,7 @@ using Real_Estate_App.UnitOfWork;
 
 namespace Real_Estate_App.Controllers
 {
+    [Authorize(Roles = "Admin,PropertyAdmin")]
     public class AdminPropertiesController : Controller
     {
         public readonly AppDbContext _appDbContext;
@@ -23,7 +25,7 @@ namespace Real_Estate_App.Controllers
                     decimal? minPrice, decimal? maxPrice, int? minGarages, int? minPets)
         {
 
-            var unitofwork = await _unitofwork.Properties.GetAvailableFilteredAsync(searchString, propertyType, minBedrooms, maxBedrooms, minBathrooms, maxBathrooms, minPrice, maxPrice, minGarages, minPets);
+            var unitofwork = await _unitofwork.Properties.GetAvailableFilteredAsync(searchString, propertyType, minBedrooms, maxBedrooms, minBathrooms, maxBathrooms, minPrice, maxPrice, minGarages, minPets, availableOnly: false);
 
             // Pass current filter values back to the view
             ViewData["SearchString"] = searchString;
