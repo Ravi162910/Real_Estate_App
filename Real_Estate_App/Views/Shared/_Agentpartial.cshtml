@@ -1,0 +1,6 @@
+﻿@if (Context.User.IsInRole("Agent"))
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="UserAdmin" asp-action="AgentsPage">Agent Page</a>
+    </li>
+}

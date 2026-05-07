@@ -35,5 +35,10 @@ namespace Real_Estate_App.Repositories
 
         public void Remove(T entity)
             => _dbSet.Remove(entity);
+
+        public IQueryable<T> GetAll() 
+        {
+            return _dbSet;
+        }
     }
 }

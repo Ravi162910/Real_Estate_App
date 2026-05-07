@@ -9,6 +9,7 @@ namespace Real_Estate_App.UnitOfWork
         IViewingRepository Viewings { get; }
         IUser_DataRepository Users { get; }
 
+        IPropertyRequestRepository PropertyRequest { get; }
         Task<int> SaveChangesAsync();
         int SaveChanges();
     }

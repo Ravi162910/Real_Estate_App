@@ -1,0 +1,87 @@
+﻿@model List<PropertyRequest>
+
+<div class="card border-2 mt-4">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Agent Dashboard</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+@foreach (var requestmade in Model)
+{
+        <div class="list-group shadow mb-sm-4">
+            <div class="list-group-item">
+                <label>Property Name:</label>
+                <strong asp-for="PropertyName">@requestmade.Property_Name</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Address:</label>
+                <strong asp-for="PropertyAddress">@requestmade.Property_Address</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Bedrooms:</label>
+                <strong asp-for="PropertyBedrooms">@requestmade.Property_Bedrooms</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Bathrooms: </label>
+                <strong asp-for="PropertyBathrooms">@requestmade.Property_Bathrooms</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Pets</label>
+                <strong asp-for="PropertyPets"> @requestmade.Property_Pets</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Garages:</label>
+                <strong asp-for="PropertyGarages"> @requestmade.Property_Garages</strong>
+            </div>
+
+            <div class="list-group-item">
+                <strong>Property Description:</strong>
+                <p asp-for="ExtendedDescription" class="form-label"> @requestmade.Property_Description</p>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Price: </label>
+                <strong asp-for="Price">$@requestmade.Property_Price</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Type: </label>
+                <strong asp-for="PropertyType">@requestmade.Property_Type</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Nearby School:</label>
+                <strong asp-for="NearbySchools"> @requestmade.Request_NearbySchools</strong>
+            </div>
+
+            <div class="list-group-item">
+                <label>Property Nearby Shops:</label>
+                <strong asp-for="NearbyShops"> @requestmade.Request_NearbyShops</strong>
+            </div>
+        </div>
+
+        <form asp-action="AgentApproveRequest" method="post" asp-route-id="@requestmade.PropertyRequestID">
+            <input asp-for="@requestmade.PropertyRequestID" type="hidden" />
+            <button type="submit" class="btn btn-success">Approve</button>
+        <form asp-action="AgentRejectRequest" method="post" asp-route-id="@requestmade.PropertyRequestID">
+            <input asp-for="@requestmade.PropertyRequestID" type="hidden" />
+            <button type="submit" class="btn btn-danger">Reject</button>
+        </form>
+        </form>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-danger mt-3">
+        <i class="bi bi-x"> No requests available </i> 
+    </div>
+}

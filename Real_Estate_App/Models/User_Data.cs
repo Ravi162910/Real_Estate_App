@@ -34,6 +34,7 @@ namespace Real_Estate_App.Models
         public string Password { get; set; }
 
         public bool IsAdmin { get; set; }
+        public bool IsAgent { get; set; }
 
         // "Super" (full access), "Property" (manages properties + viewings),
         // "Transaction" (reviews purchase queue). Null/empty for non-admins.
