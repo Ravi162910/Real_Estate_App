@@ -1,40 +1,141 @@
-﻿@model Transaction
+@model Real_Estate_App.Models.Transaction
+
+@{
+    ViewData["Title"] = $"Transaction #{Model.TransactionId}";
+    var status = Model.Status;
+    var statusBadgeClass = status switch
+    {
+        Real_Estate_App.Models.Transaction.StatusApproved => "bg-success",
+        Real_Estate_App.Models.Transaction.StatusRejected => "bg-danger",
+        _ => "bg-warning text-dark"
+    };
+    var isPending = status == Real_Estate_App.Models.Transaction.StatusPending;
+}
+
 <div class="card border-2 mt-4">
-    <div class="card-header bg-secondary py-4">
-        <div class="row">
-            <div class="col text-center">
-                <h2 class="py-2">Transaction Details below:</h2>
+    <div class="card-header bg-secondary text-white py-4">
+        <div class="row align-items-center">
+            <div class="col">
+                <h2 class="py-2 mb-0">Transaction #@Model.TransactionId</h2>
+            </div>
+            <div class="col-auto">
+                <span class="badge fs-6 @statusBadgeClass">@status</span>
             </div>
         </div>
     </div>
 </div>
-<div class="list-group shadow mb-3">
+
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success mt-3">@TempData["success"]</div>
+}
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger mt-3">@TempData["error"]</div>
+}
+
+<div class="list-group shadow mb-3 mt-3">
     <div class="list-group-item">
-        <label>Property ID:</label>
-        <strong asp-for="PropertyName">#@Model.PropertyId</strong>
+        <label class="fw-bold">Property ID:</label>
+        <span>#@Model.PropertyId</span>
     </div>
     <div class="list-group-item">
-        <label>Property Name:</label>
-        <strong asp-for="PropertyName">@Model.Property.PropertyName</strong>
+        <label class="fw-bold">Property Name:</label>
+        <span>@Model.Property?.PropertyName</span>
     </div>
     <div class="list-group-item">
-        <label>Property Buyer:</label>
-        <strong asp-for="PropertyName">@Model.BuyerName</strong>
+        <label class="fw-bold">Property Address:</label>
+        <span>@Model.Property?.PropertyAddress</span>
     </div>
     <div class="list-group-item">
-        <label>Buyer's Email:</label>
-        <strong asp-for="PropertyName">@Model.UserEmail</strong>
+        <label class="fw-bold">Buyer:</label>
+        <span>@Model.BuyerName</span>
     </div>
     <div class="list-group-item">
-        <label>Property Buyer:</label>
-        <strong asp-for="PropertyName">@Model.Price.ToString("C")</strong>
+        <label class="fw-bold">Buyer's Email:</label>
+        <span>@Model.UserEmail</span>
     </div>
     <div class="list-group-item">
-        <label>Property Purchased on:</label>
-        <strong asp-for="PropertyName">@Model.PurchaseDate.ToString("dd/MM/yyyy hh:mm tt")</strong>
+        <label class="fw-bold">Price:</label>
+        <span>@Model.Price.ToString("C")</span>
     </div>
+    <div class="list-group-item">
+        <label class="fw-bold">Requested On:</label>
+        <span>@Model.PurchaseDate.ToString("dd/MM/yyyy hh:mm tt")</span>
+    </div>
+    @if (Model.ReviewedDate.HasValue)
+    {
+        <div class="list-group-item">
+            <label class="fw-bold">Reviewed On:</label>
+            <span>@Model.ReviewedDate.Value.ToString("dd/MM/yyyy hh:mm tt")</span>
+        </div>
+    }
+    @if (Model.ReviewedByUserId.HasValue)
+    {
+        <div class="list-group-item">
+            <label class="fw-bold">Reviewed By (User ID):</label>
+            <span>@Model.ReviewedByUserId</span>
+        </div>
+    }
+    @if (status == Real_Estate_App.Models.Transaction.StatusRejected && !string.IsNullOrWhiteSpace(Model.RejectionReason))
+    {
+        <div class="list-group-item">
+            <label class="fw-bold">Rejection Reason:</label>
+            <div>@Model.RejectionReason</div>
+        </div>
+    }
 </div>
 
+@if (isPending)
+{
+    <div class="card border-warning shadow mb-3">
+        <div class="card-header bg-warning text-dark">
+            <strong>Review this request</strong>
+        </div>
+        <div class="card-body">
+            <p>Approving will mark <strong>@Model.Property?.PropertyName</strong> as sold and email <strong>@Model.UserEmail</strong>. Rejecting lets you include an optional reason in the email.</p>
 
-<a asp-action="Index" asp-route-id="@Model.PropertyId" class="btn btn-sm btn-primary mt-2"><i class="bi bi-arrow-left"></i> Go back to Transaction List</a>
+            <div class="d-flex flex-wrap gap-2">
+                <form asp-action="Approve" asp-route-id="@Model.TransactionId" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-success"
+                            onclick="return confirm('Approve this purchase? The property will be marked as sold and the buyer will be emailed.');">
+                        <i class="bi bi-check-lg"></i> Approve Purchase
+                    </button>
+                </form>
 
+                <button type="button" class="btn btn-danger"
+                        data-bs-toggle="modal" data-bs-target="#rejectModal">
+                    <i class="bi bi-x-lg"></i> Reject Purchase
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form asp-action="Reject" asp-route-id="@Model.TransactionId" method="post" class="modal-content">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Reject Purchase Request #@Model.TransactionId</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Reject the request from <strong>@Model.BuyerName</strong> for <strong>@Model.Property?.PropertyName</strong>?</p>
+                    <div class="mb-2">
+                        <label class="form-label">Reason (optional, included in the buyer's email)</label>
+                        <textarea name="rejectionReason" class="form-control" rows="3" maxlength="500" placeholder="e.g. Buyer did not pass the financial pre-check."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+<a asp-action="Index" class="btn btn-sm btn-primary mt-2">
+    <i class="bi bi-arrow-left"></i> Back to Queue
+</a>

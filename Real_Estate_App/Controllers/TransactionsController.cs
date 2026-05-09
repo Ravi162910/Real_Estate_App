@@ -47,6 +47,8 @@ namespace Real_Estate_App.Controllers
         }
 
         // POST: Transactions/Checkout
+        // Creates a Pending transaction; the property stays available until a
+        // Transaction Admin approves it from the queue.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Checkout(CheckoutViewModel model)
@@ -68,27 +70,23 @@ namespace Real_Estate_App.Controllers
                 return RedirectToAction("Details", "Properties", new { id = model.PropertyId });
             }
 
-            // Create the transaction
             var transaction = new Transaction
             {
                 PropertyId = model.PropertyId,
-                UserId = 0, // Guest checkout - no user login required
+                UserId = 0,
                 Price = property.Price,
                 UserEmail = model.UserEmail,
                 BuyerName = model.BuyerName,
-                PurchaseDate = DateTime.Now
+                PurchaseDate = DateTime.Now,
+                Status = Transaction.StatusPending
             };
-
-            // Mark the property as no longer available
-            property.IsAvailable = false;
 
             await _unitOfWork.Transactions.AddAsync(transaction);
             await _unitOfWork.SaveChangesAsync();
 
-            // Send email notification
             try
             {
-                var sent = await _emailService.SendPurchaseConfirmationAsync(
+                var sent = await _emailService.SendPurchaseRequestReceivedAsync(
                     model.UserEmail,
                     model.BuyerName,
                     property.PropertyName,

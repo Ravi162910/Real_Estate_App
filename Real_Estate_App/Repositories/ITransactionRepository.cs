@@ -7,5 +7,7 @@ namespace Real_Estate_App.Repositories
         Task<IEnumerable<Transaction>> GetAllWithPropertyAsync();
         Task<Transaction?> GetByIdWithPropertyAsync(int id);
         Task<IEnumerable<Transaction>> GetByUserIdAsync(int userId);
+        Task<IEnumerable<Transaction>> GetByStatusAsync(string status);
+        Task<int> CountByStatusAsync(string status);
     }
 }

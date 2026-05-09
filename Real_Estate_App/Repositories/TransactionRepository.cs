@@ -9,7 +9,9 @@ namespace Real_Estate_App.Repositories
         public TransactionRepository(AppDbContext context) : base(context) { }
 
         public async Task<IEnumerable<Transaction>> GetAllWithPropertyAsync()
-            => await _dbSet.Include(t => t.Property).ToListAsync();
+            => await _dbSet.Include(t => t.Property)
+                           .OrderByDescending(t => t.PurchaseDate)
+                           .ToListAsync();
 
         public async Task<Transaction?> GetByIdWithPropertyAsync(int id)
             => await _dbSet.Include(t => t.Property)
@@ -20,5 +22,14 @@ namespace Real_Estate_App.Repositories
                            .Where(t => t.UserId == userId)
                            .OrderByDescending(t => t.PurchaseDate)
                            .ToListAsync();
+
+        public async Task<IEnumerable<Transaction>> GetByStatusAsync(string status)
+            => await _dbSet.Include(t => t.Property)
+                           .Where(t => t.Status == status)
+                           .OrderByDescending(t => t.PurchaseDate)
+                           .ToListAsync();
+
+        public async Task<int> CountByStatusAsync(string status)
+            => await _dbSet.CountAsync(t => t.Status == status);
     }
 }

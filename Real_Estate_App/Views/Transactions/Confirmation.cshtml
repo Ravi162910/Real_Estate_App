@@ -1,22 +1,61 @@
 @model Real_Estate_App.Models.Transaction
 
 @{
-    ViewData["Title"] = "Purchase Confirmation";
+    ViewData["Title"] = "Purchase Request Submitted";
     var emailSent = ViewData["EmailSent"] as bool?;
+    var status = Model.Status;
+    var isPending = status == Real_Estate_App.Models.Transaction.StatusPending;
+    var isApproved = status == Real_Estate_App.Models.Transaction.StatusApproved;
+    var isRejected = status == Real_Estate_App.Models.Transaction.StatusRejected;
+
+    string headerColor;
+    string iconChar;
+    string iconColor;
+    string heading;
+    string lede;
+    string statusBadgeClass;
+
+    if (isApproved)
+    {
+        headerColor = "bg-success";
+        iconChar = "&#10004;";
+        iconColor = "#28a745";
+        heading = "Purchase Approved!";
+        lede = $"Congratulations, {Model.BuyerName}! Your purchase has been approved.";
+        statusBadgeClass = "bg-success";
+    }
+    else if (isRejected)
+    {
+        headerColor = "bg-danger";
+        iconChar = "&#10006;";
+        iconColor = "#c0392b";
+        heading = "Purchase Request Declined";
+        lede = $"Hi {Model.BuyerName}, unfortunately your purchase request was declined.";
+        statusBadgeClass = "bg-danger";
+    }
+    else
+    {
+        headerColor = "bg-warning";
+        iconChar = "&#9203;";
+        iconColor = "#f39c12";
+        heading = "Purchase Request Submitted";
+        lede = $"Thanks {Model.BuyerName}! Your request is now awaiting Transaction Admin review.";
+        statusBadgeClass = "bg-warning text-dark";
+    }
 }
 
 <div class="text-center mt-4">
     <div class="mb-4">
-        <span style="font-size: 4rem; color: #28a745;">&#10004;</span>
+        <span style="font-size: 4rem; color: @iconColor;">@Html.Raw(iconChar)</span>
     </div>
-    <h1 class="text-success">Purchase Successful!</h1>
-    <p class="lead">Thank you for your purchase, <strong>@Model.BuyerName</strong>.</p>
+    <h1>@heading</h1>
+    <p class="lead">@lede</p>
 </div>
 
 <div class="row justify-content-center mt-4">
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header bg-success text-white">
+            <div class="card-header @headerColor text-white">
                 <h5 class="mb-0">Transaction Receipt</h5>
             </div>
             <div class="card-body">
@@ -24,14 +63,17 @@
                     <dt class="col-sm-4">Transaction ID</dt>
                     <dd class="col-sm-8">#@Model.TransactionId</dd>
 
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8"><span class="badge @statusBadgeClass">@status</span></dd>
+
                     <dt class="col-sm-4">Property</dt>
                     <dd class="col-sm-8">@Model.Property?.PropertyName</dd>
 
                     <dt class="col-sm-4">Address</dt>
                     <dd class="col-sm-8">@Model.Property?.PropertyAddress</dd>
 
-                    <dt class="col-sm-4">Price Paid</dt>
-                    <dd class="col-sm-8 fw-bold text-success">@Model.Price.ToString("C")</dd>
+                    <dt class="col-sm-4">Price</dt>
+                    <dd class="col-sm-8 fw-bold">@Model.Price.ToString("C")</dd>
 
                     <dt class="col-sm-4">Buyer</dt>
                     <dd class="col-sm-8">@Model.BuyerName</dd>
@@ -39,16 +81,35 @@
                     <dt class="col-sm-4">Email</dt>
                     <dd class="col-sm-8">@Model.UserEmail</dd>
 
-                    <dt class="col-sm-4">Purchase Date</dt>
+                    <dt class="col-sm-4">Request Date</dt>
                     <dd class="col-sm-8">@Model.PurchaseDate.ToString("dddd, dd MMMM yyyy 'at' hh:mm tt")</dd>
+
+                    @if (Model.ReviewedDate.HasValue)
+                    {
+                        <dt class="col-sm-4">Reviewed Date</dt>
+                        <dd class="col-sm-8">@Model.ReviewedDate.Value.ToString("dddd, dd MMMM yyyy 'at' hh:mm tt")</dd>
+                    }
+
+                    @if (isRejected && !string.IsNullOrWhiteSpace(Model.RejectionReason))
+                    {
+                        <dt class="col-sm-4">Reason</dt>
+                        <dd class="col-sm-8">@Model.RejectionReason</dd>
+                    }
                 </dl>
             </div>
         </div>
 
+        @if (isPending)
+        {
+            <div class="alert alert-info mt-3">
+                <strong>What happens next?</strong> A Transaction Admin will review your request. You will receive an email once it has been approved or declined.
+            </div>
+        }
+
         @if (emailSent == true)
         {
             <div class="alert alert-success mt-3">
-                <strong>Email Sent!</strong> A confirmation email has been sent to <strong>@Model.UserEmail</strong>.
+                <strong>Email Sent!</strong> A confirmation has been sent to <strong>@Model.UserEmail</strong>.
             </div>
         }
         else if (emailSent == false)

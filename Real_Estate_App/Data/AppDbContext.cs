@@ -234,7 +234,9 @@ namespace Real_Estate_App.Data
                     Price = 415000.00m,
                     UserEmail = "sarah.mitchell@gmail.com",
                     BuyerName = "Sarah Mitchell",
-                    PurchaseDate = new DateTime(2026, 3, 15, 10, 30, 0)
+                    PurchaseDate = new DateTime(2026, 3, 15, 10, 30, 0),
+                    Status = Transaction.StatusApproved,
+                    ReviewedDate = new DateTime(2026, 3, 15, 11, 0, 0)
                 },
                 new Transaction
                 {
@@ -244,7 +246,9 @@ namespace Real_Estate_App.Data
                     Price = 285000.00m,
                     UserEmail = "james.wu@outlook.com",
                     BuyerName = "James Wu",
-                    PurchaseDate = new DateTime(2026, 3, 22, 14, 0, 0)
+                    PurchaseDate = new DateTime(2026, 3, 22, 14, 0, 0),
+                    Status = Transaction.StatusApproved,
+                    ReviewedDate = new DateTime(2026, 3, 22, 14, 30, 0)
                 },
                 new Transaction
                 {
@@ -254,7 +258,9 @@ namespace Real_Estate_App.Data
                     Price = 680000.00m,
                     UserEmail = "emma.taylor@yahoo.com",
                     BuyerName = "Emma Taylor",
-                    PurchaseDate = new DateTime(2026, 4, 1, 9, 15, 0)
+                    PurchaseDate = new DateTime(2026, 4, 1, 9, 15, 0),
+                    Status = Transaction.StatusApproved,
+                    ReviewedDate = new DateTime(2026, 4, 1, 10, 0, 0)
                 }
             );
         }

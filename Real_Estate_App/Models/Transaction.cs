@@ -5,6 +5,10 @@ namespace Real_Estate_App.Models
 {
     public class Transaction
     {
+        public const string StatusPending = "Pending";
+        public const string StatusApproved = "Approved";
+        public const string StatusRejected = "Rejected";
+
         [Key]
         public int TransactionId { get; set; }
 
@@ -33,7 +37,22 @@ namespace Real_Estate_App.Models
         [DataType(DataType.DateTime)]
         public DateTime PurchaseDate { get; set; } = DateTime.Now;
 
-        // Navigation property
+        [Required]
+        [MaxLength(20)]
+        [Display(Name = "Status")]
+        public string Status { get; set; } = StatusPending;
+
+        [Display(Name = "Reviewed By")]
+        public int? ReviewedByUserId { get; set; }
+
+        [Display(Name = "Reviewed Date")]
+        [DataType(DataType.DateTime)]
+        public DateTime? ReviewedDate { get; set; }
+
+        [MaxLength(500)]
+        [Display(Name = "Rejection Reason")]
+        public string? RejectionReason { get; set; }
+
         [ForeignKey("PropertyId")]
         public Property? Property { get; set; }
     }
