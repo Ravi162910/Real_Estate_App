@@ -18,5 +18,7 @@ namespace Real_Estate_App.Repositories
             bool availableOnly = true);
 
         Task<IEnumerable<string>> GetDistinctPropertyTypesAsync();
+
+        Task<Property?> GetPropertyIdWithOpenHomeDataAsync(int id);
     }
 }

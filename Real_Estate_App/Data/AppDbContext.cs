@@ -19,6 +19,8 @@ namespace Real_Estate_App.Data
 
         public DbSet<PropertyRequest> PropertyRequestsSet { get; set; }
 
+        public DbSet<OpenHome> OpenHomesSet { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
