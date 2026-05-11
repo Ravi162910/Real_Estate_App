@@ -35,7 +35,7 @@ namespace Real_Estate_App.Models
 
         [Display(Name = "Purchase Date")]
         [DataType(DataType.DateTime)]
-        public DateTime PurchaseDate { get; set; } = DateTime.Now;
+        public DateTime PurchaseDate { get; set; } = DateTime.UtcNow;
 
         [Required]
         [MaxLength(20)]

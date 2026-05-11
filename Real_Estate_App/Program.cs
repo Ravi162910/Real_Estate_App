@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
 using Real_Estate_App.Services;
 using Real_Estate_App.UnitOfWork;
 using System.Data.Common;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,12 +31,44 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<IPasswordHasher<User_Data>, PasswordHasher<User_Data>>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddMemoryCache();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/UserAdmin/Login";
         options.AccessDeniedPath = "/UserAdmin/Login";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.ExpireTimeSpan = TimeSpan.FromHours(2);
+        options.SlidingExpiration = true;
     });//allow cookie
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("login", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+
+    options.AddPolicy("checkout", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+});
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope()) //Important for Seeding Database data & Auto Migrations when the app runs
@@ -145,7 +180,35 @@ using (var scope = app.Services.CreateScope()) //Important for Seeding Database 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.Use(async (context, next) =>
+{
+    var headers = context.Response.Headers;
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["X-Frame-Options"] = "DENY";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+
+    // 'unsafe-inline' is required for now: ~13 inline style="..." attributes and
+    // 5 inline onclick handlers across views. Tightening to nonces/hashes is an
+    // A3 refactor. Stripe origins are pre-allowlisted for the payment flow.
+    headers["Content-Security-Policy"] =
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://js.stripe.com; " +
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+        "img-src 'self' data: https:; " +
+        "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+        "connect-src 'self' https://api.stripe.com; " +
+        "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com; " +
+        "form-action 'self' https://checkout.stripe.com; " +
+        "frame-ancestors 'none'; " +
+        "base-uri 'self'; " +
+        "object-src 'none'";
+
+    await next();
+});
+
 app.UseRouting();
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

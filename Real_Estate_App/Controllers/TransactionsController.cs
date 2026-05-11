@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
 using Real_Estate_App.Services;
@@ -12,12 +14,14 @@ namespace Real_Estate_App.Controllers
         private readonly IEmailService _emailService;
         private readonly ILogger<TransactionsController> _logger;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMemoryCache _cache;
 
-        public TransactionsController(IEmailService emailService, ILogger<TransactionsController> logger, IUnitOfWork unitOfWork)
+        public TransactionsController(IEmailService emailService, ILogger<TransactionsController> logger, IUnitOfWork unitOfWork, IMemoryCache cache)
         {
             _emailService = emailService;
             _logger = logger;
             _unitOfWork = unitOfWork;
+            _cache = cache;
         }
 
         // GET: Transactions/Checkout/5
@@ -35,12 +39,16 @@ namespace Real_Estate_App.Controllers
                 return RedirectToAction("Details", "Properties", new { id });
             }
 
+            var submitToken = Guid.NewGuid().ToString("N");
+            _cache.Set(SubmitTokenKey(submitToken), true, TimeSpan.FromMinutes(30));
+
             var viewModel = new CheckoutViewModel
             {
                 PropertyId = property.PropertyId,
                 PropertyName = property.PropertyName,
                 PropertyAddress = property.PropertyAddress,
-                Price = property.Price
+                Price = property.Price,
+                SubmitToken = submitToken
             };
 
             return View(viewModel);
@@ -51,12 +59,23 @@ namespace Real_Estate_App.Controllers
         // Transaction Admin approves it from the queue.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting("checkout")]
         public async Task<IActionResult> Checkout(CheckoutViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
+
+            // Consume the one-shot submit token. If it's missing/already-used,
+            // this is a duplicate submission (refresh, double-click, back+submit).
+            var tokenKey = SubmitTokenKey(model.SubmitToken);
+            if (string.IsNullOrEmpty(model.SubmitToken) || !_cache.TryGetValue(tokenKey, out _))
+            {
+                TempData["Error"] = "This checkout has already been submitted. Please start a new purchase if you'd like to try again.";
+                return RedirectToAction("Details", "Properties", new { id = model.PropertyId });
+            }
+            _cache.Remove(tokenKey);
 
             var property = await _unitOfWork.Properties.GetByIdAsync(model.PropertyId);
             if (property == null)
@@ -70,14 +89,18 @@ namespace Real_Estate_App.Controllers
                 return RedirectToAction("Details", "Properties", new { id = model.PropertyId });
             }
 
+            // Link the transaction to the buyer's account if they're logged in.
+            // Anonymous buyers still get a row, with UserId = 0.
+            int buyerUserId = int.TryParse(User.FindFirst("UserID")?.Value, out var uid) ? uid : 0;
+
             var transaction = new Transaction
             {
                 PropertyId = model.PropertyId,
-                UserId = 0,
+                UserId = buyerUserId,
                 Price = property.Price,
                 UserEmail = model.UserEmail,
                 BuyerName = model.BuyerName,
-                PurchaseDate = DateTime.Now,
+                PurchaseDate = DateTime.UtcNow,
                 Status = Transaction.StatusPending
             };
 
@@ -102,11 +125,16 @@ namespace Real_Estate_App.Controllers
                 TempData["EmailSent"] = false;
             }
 
-            return RedirectToAction(nameof(Confirmation), new { id = transaction.TransactionId });
+            // One-time token so an anonymous buyer can view their receipt without
+            // exposing the Confirmation page to ID enumeration.
+            var confirmToken = Guid.NewGuid().ToString("N");
+            TempData[ConfirmTokenKey(transaction.TransactionId)] = confirmToken;
+
+            return RedirectToAction(nameof(Confirmation), new { id = transaction.TransactionId, token = confirmToken });
         }
 
         // GET: Transactions/Confirmation/5
-        public async Task<IActionResult> Confirmation(int id)
+        public async Task<IActionResult> Confirmation(int id, string? token)
         {
             var transaction = await _unitOfWork.Transactions.GetByIdWithPropertyAsync(id);
 
@@ -115,8 +143,33 @@ namespace Real_Estate_App.Controllers
                 return NotFound();
             }
 
+            var expectedToken = TempData.Peek(ConfirmTokenKey(id)) as string;
+            bool tokenOk = !string.IsNullOrEmpty(token)
+                        && !string.IsNullOrEmpty(expectedToken)
+                        && token == expectedToken;
+
+            bool ownerOk = User.Identity?.IsAuthenticated == true
+                        && int.TryParse(User.FindFirst("UserID")?.Value, out var uid)
+                        && transaction.UserId == uid
+                        && uid != 0;
+
+            if (!tokenOk && !ownerOk)
+            {
+                return NotFound();
+            }
+
+            // Keep the token so refreshing the receipt page still works.
+            if (tokenOk)
+            {
+                TempData.Keep(ConfirmTokenKey(id));
+            }
+
             ViewData["EmailSent"] = TempData["EmailSent"];
             return View(transaction);
         }
+
+        private static string ConfirmTokenKey(int transactionId) => $"ConfirmToken_{transactionId}";
+
+        private static string SubmitTokenKey(string token) => $"checkout-submit:{token}";
     }
 }

@@ -75,7 +75,7 @@ else
                     <td>@item.BuyerName</td>
                     <td>@item.UserEmail</td>
                     <td>@item.Price.ToString("C")</td>
-                    <td>@item.PurchaseDate.ToString("dd/MM/yyyy hh:mm tt")</td>
+                    <td>@item.PurchaseDate.ToLocalDisplay().ToString("dd/MM/yyyy hh:mm tt")</td>
                     <td>
                         <a asp-action="Details" asp-route-id="@item.TransactionId" class="btn btn-sm btn-outline-secondary">
                             <i class="bi bi-card-list"></i> Details

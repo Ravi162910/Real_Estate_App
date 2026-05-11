@@ -83,6 +83,9 @@ namespace Real_Estate_App.Services
 
         private string BuildShell(string heading, string headingColor, string buyerName, string introHtml, string statusLabel, string statusColor, string propertyName, string propertyAddress, decimal price, DateTime date, string dateLabel, string? extraHtml)
         {
+            // Dates are stored as UTC; SpecifyKind handles values loaded from EF
+            // which come back with Kind=Unspecified.
+            var displayDate = DateTime.SpecifyKind(date, DateTimeKind.Utc).ToLocalTime();
             return $@"
 <html>
 <body style='font-family: Arial, sans-serif; color: #333;'>
@@ -110,7 +113,7 @@ namespace Real_Estate_App.Services
                 </tr>
                 <tr>
                     <td style='padding: 8px 0; font-weight: bold;'>{dateLabel}:</td>
-                    <td style='padding: 8px 0;'>{date:dddd, dd MMMM yyyy}</td>
+                    <td style='padding: 8px 0;'>{displayDate:dddd, dd MMMM yyyy}</td>
                 </tr>
                 <tr>
                     <td style='padding: 8px 0; font-weight: bold;'>Status:</td>

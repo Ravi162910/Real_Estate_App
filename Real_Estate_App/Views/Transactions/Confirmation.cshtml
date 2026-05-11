@@ -82,12 +82,12 @@
                     <dd class="col-sm-8">@Model.UserEmail</dd>
 
                     <dt class="col-sm-4">Request Date</dt>
-                    <dd class="col-sm-8">@Model.PurchaseDate.ToString("dddd, dd MMMM yyyy 'at' hh:mm tt")</dd>
+                    <dd class="col-sm-8">@Model.PurchaseDate.ToLocalDisplay().ToString("dddd, dd MMMM yyyy 'at' hh:mm tt")</dd>
 
                     @if (Model.ReviewedDate.HasValue)
                     {
                         <dt class="col-sm-4">Reviewed Date</dt>
-                        <dd class="col-sm-8">@Model.ReviewedDate.Value.ToString("dddd, dd MMMM yyyy 'at' hh:mm tt")</dd>
+                        <dd class="col-sm-8">@Model.ReviewedDate.Value.ToLocalDisplay().ToString("dddd, dd MMMM yyyy 'at' hh:mm tt")</dd>
                     }
 
                     @if (isRejected && !string.IsNullOrWhiteSpace(Model.RejectionReason))

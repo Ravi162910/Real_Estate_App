@@ -61,13 +61,13 @@
     </div>
     <div class="list-group-item">
         <label class="fw-bold">Requested On:</label>
-        <span>@Model.PurchaseDate.ToString("dd/MM/yyyy hh:mm tt")</span>
+        <span>@Model.PurchaseDate.ToLocalDisplay().ToString("dd/MM/yyyy hh:mm tt")</span>
     </div>
     @if (Model.ReviewedDate.HasValue)
     {
         <div class="list-group-item">
             <label class="fw-bold">Reviewed On:</label>
-            <span>@Model.ReviewedDate.Value.ToString("dd/MM/yyyy hh:mm tt")</span>
+            <span>@Model.ReviewedDate.Value.ToLocalDisplay().ToString("dd/MM/yyyy hh:mm tt")</span>
         </div>
     }
     @if (Model.ReviewedByUserId.HasValue)

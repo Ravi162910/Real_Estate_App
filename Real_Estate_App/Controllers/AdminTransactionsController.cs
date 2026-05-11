@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Real_Estate_App.Models;
 using Real_Estate_App.Services;
 using Real_Estate_App.UnitOfWork;
@@ -76,13 +77,24 @@ namespace Real_Estate_App.Controllers
             }
 
             transaction.Status = Transaction.StatusApproved;
-            transaction.ReviewedDate = DateTime.Now;
+            transaction.ReviewedDate = DateTime.UtcNow;
             transaction.ReviewedByUserId = GetCurrentUserId();
             property.IsAvailable = false;
 
             _unitofwork.Transactions.Update(transaction);
             _unitofwork.Properties.Update(property);
-            await _unitofwork.SaveChangesAsync();
+
+            try
+            {
+                await _unitofwork.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Another admin approved a different request for the same
+                // property in parallel. Their save won the race.
+                TempData["error"] = "This property was just sold to another buyer by a different admin. The request has not been approved.";
+                return RedirectToAction(nameof(Details), new { ID = id });
+            }
 
             try
             {
@@ -120,7 +132,7 @@ namespace Real_Estate_App.Controllers
             }
 
             transaction.Status = Transaction.StatusRejected;
-            transaction.ReviewedDate = DateTime.Now;
+            transaction.ReviewedDate = DateTime.UtcNow;
             transaction.ReviewedByUserId = GetCurrentUserId();
             transaction.RejectionReason = string.IsNullOrWhiteSpace(rejectionReason) ? null : rejectionReason.Trim();
 

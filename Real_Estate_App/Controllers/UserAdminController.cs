@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 using Real_Estate_App.UnitOfWork;
 using Real_Estate_App.Repositories;
@@ -81,6 +82,7 @@ namespace Real_Estate_App.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting("login")]
         public async Task<IActionResult> Login(LoginViewModel loginViewModelobj)
         {
             if (!ModelState.IsValid)

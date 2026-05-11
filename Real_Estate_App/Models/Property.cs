@@ -51,7 +51,11 @@ namespace Real_Estate_App.Models
         [Display(Name = "Property Type")]
         public string PropertyType { get; set; } = string.Empty;
 
+        // ConcurrencyCheck: EF appends "WHERE IsAvailable = <original>" to the
+        // UPDATE so two simultaneous approvals can't both flip true -> false.
+        // The second SaveChanges throws DbUpdateConcurrencyException.
         [Display(Name = "Is Available")]
+        [ConcurrencyCheck]
         public bool IsAvailable { get; set; } = true;
 
         [Display(Name = "Nearby Schools")]

@@ -9,6 +9,10 @@ namespace Real_Estate_App.Models
         public string PropertyAddress { get; set; } = string.Empty;
         public decimal Price { get; set; }
 
+        // Server-issued one-shot token so a refreshed/double-clicked form
+        // doesn't create duplicate Transaction rows.
+        public string SubmitToken { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Full name is required")]
         [Display(Name = "Full Name")]
         [StringLength(100)]

@@ -31,9 +31,13 @@ namespace Real_Estate_App.Repositories
 
             if (!string.IsNullOrEmpty(searchString))
             {
+                // EF.Functions.Like is translated to SQL LIKE, which is
+                // case-insensitive on SQL Server and SQLite by default,
+                // unlike string.Contains which differs across providers.
+                var pattern = $"%{searchString}%";
                 query = query.Where(p =>
-                    p.PropertyName.Contains(searchString) ||
-                    p.PropertyAddress.Contains(searchString));
+                    EF.Functions.Like(p.PropertyName, pattern) ||
+                    EF.Functions.Like(p.PropertyAddress, pattern));
             }
 
             if (!string.IsNullOrEmpty(propertyType))
