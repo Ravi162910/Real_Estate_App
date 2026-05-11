@@ -1,0 +1,29 @@
+﻿@model OpenHome
+
+<div class="card border-2 mt-4">
+    <div class="card-header bg-secondary py-4">
+        <div class="row">
+            <div class="col text-center">
+                <h2 class="py-2">Add an Open Home</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form method="post">
+    <input asp-for="OpenHomeId" hidden />
+    <input asp-for="PropertyId" hidden />
+    <div class="mb-3">
+        <label asp-for="@Model.StartTime"></label>
+        <input asp-for="@Model.StartTime" class="form-control border-3 shadow" type="datetime-local" />
+        <span asp-validation-for="@Model.StartTime" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="@Model.EndTime"></label>
+        <input asp-for="@Model.EndTime" class="form-control border-3 shadow" type="datetime-local" />
+        <span asp-validation-for="@Model.EndTime" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-pen"></i> Add Open home
+    </button>
+</form>

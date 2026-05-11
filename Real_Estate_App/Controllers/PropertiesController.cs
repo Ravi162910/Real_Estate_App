@@ -19,7 +19,7 @@ namespace Real_Estate_App.Controllers
         // GET: Properties
         public async Task<IActionResult> Index(string? searchString, string? propertyType,
                     int? minBedrooms, int? maxBedrooms, int? minBathrooms, int? maxBathrooms,
-                    decimal? minPrice, decimal? maxPrice, int? minGarages, int? minPets)
+                    decimal? minPrice, decimal? maxPrice, int? minGarages, int? minPets, Models.Property property)
         {
 
             var properties = await _unitofwork.Properties.GetAvailableFilteredAsync(searchString, propertyType, minBedrooms, maxBedrooms, minBathrooms, maxBathrooms, minPrice, maxPrice, minGarages, minPets);
@@ -38,14 +38,13 @@ namespace Real_Estate_App.Controllers
 
             // Get distinct property types for the dropdown
             ViewData["PropertyTypes"] = await _unitofwork.Properties.GetDistinctPropertyTypesAsync();
-
             return View(properties.ToList());
         }
 
         // GET: Properties/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            var property = await _unitofwork.Properties.GetByIdAsync(id);
+            var property = await _unitofwork.Properties.GetPropertyIdWithOpenHomeDataAsync(id);
 
             if (property == null)
             {

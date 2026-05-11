@@ -61,5 +61,7 @@ namespace Real_Estate_App.Models
         public string? NearbyShops { get; set; }
 
         public List<Viewing>? Viewings_list { get; set; }// One
+
+        public List<OpenHome> OpenHomes { get; set; }
     }
 }

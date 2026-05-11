@@ -59,6 +59,8 @@ namespace Real_Estate_App.Repositories
             if (minPets.HasValue)
                 query = query.Where(p => p.PropertyPets >= minPets.Value);
 
+            query = query.Include(openhomes => openhomes.OpenHomes);
+
             return await query.ToListAsync();
         }
 
@@ -68,5 +70,10 @@ namespace Real_Estate_App.Repositories
                 .Distinct()
                 .OrderBy(t => t)
                 .ToListAsync();
+
+        public async Task<Property?> GetPropertyIdWithOpenHomeDataAsync(int ID)
+        {
+            return await _dbSet.Include(openhome => openhome.OpenHomes).FirstOrDefaultAsync(property => property.PropertyId == ID);
+        }
     }
 }
