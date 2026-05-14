@@ -79,7 +79,7 @@ namespace Real_Estate_App.Data
                     IsAvailable = true,
                     NearbySchools = "Auckland Grammar School, Epsom Girls Grammar",
                     NearbyShops = "Newmarket Shopping Centre, Parnell Village",
-                    ImageUrl = "/images/property/sunny_villa.jpg"
+                    ImageUrl = "/images/properties/sunny_villa.jpg"
                 },
                 new Property
                 {
@@ -96,7 +96,7 @@ namespace Real_Estate_App.Data
                     IsAvailable = true,
                     NearbySchools = "Auckland International College",
                     NearbyShops = "Commercial Bay, Britomart",
-                    ImageUrl = "/images/property/city_central.jpg"
+                    ImageUrl = "/images/properties/city_central.jpg"
                 },
                 new Property
                 {
@@ -113,7 +113,7 @@ namespace Real_Estate_App.Data
                     IsAvailable = false,
                     NearbySchools = "Ponsonby Intermediate",
                     NearbyShops = "Ponsonby Central, K Road shops",
-                    ImageUrl = "/images/property/flat.jpg"
+                    ImageUrl = "/images/properties/flat.jpg"
                 },
                 new Property
                 {
@@ -130,7 +130,7 @@ namespace Real_Estate_App.Data
                     IsAvailable = true,
                     NearbySchools = "Devonport Primary, Takapuna Grammar",
                     NearbyShops = "Devonport Village shops, Takapuna Mall",
-                    ImageUrl = "/images/property/family_house.jpg"
+                    ImageUrl = "/images/properties/family_house.jpg"
                 },
                 new Property
                 {
@@ -147,7 +147,7 @@ namespace Real_Estate_App.Data
                     IsAvailable = true,
                     NearbySchools = "Mt Eden Normal Primary, Kowhai Intermediate",
                     NearbyShops = "Mt Eden Village, Dominion Road eateries",
-                    ImageUrl = "/images/property/town_house.jpg"
+                    ImageUrl = "/images/properties/town_house.jpg"
                 },
                 new Property
                 {
@@ -164,7 +164,7 @@ namespace Real_Estate_App.Data
                     IsAvailable = false,
                     NearbySchools = "University of Auckland",
                     NearbyShops = "Grafton shops, Newmarket",
-                    ImageUrl = "/images/property/studio.jpg"
+                    ImageUrl = "/images/properties/studio.jpg"
                 },
                 new Property
                 {
@@ -181,7 +181,7 @@ namespace Real_Estate_App.Data
                     IsAvailable = true,
                     NearbySchools = "Remuera Primary, King's College, Diocesan School",
                     NearbyShops = "Remuera Village, Meadowbank Shopping Centre",
-                    ImageUrl = "/images/property/family_house_2.jpg"
+                    ImageUrl = "/images/properties/family_house_2.jpg"
                 },
                 new Property
                 {
@@ -198,7 +198,7 @@ namespace Real_Estate_App.Data
                     IsAvailable = true,
                     NearbySchools = "Hobsonville Point Primary, Hobsonville Point Secondary",
                     NearbyShops = "Hobsonville Point Village, West Harbour shops",
-                    ImageUrl = "/images/property/apartment_2.jpg"
+                    ImageUrl = "/images/properties/apartment_2.jpg"
                 },
                 new Property
                 {
@@ -215,7 +215,7 @@ namespace Real_Estate_App.Data
                     IsAvailable = true,
                     NearbySchools = "Grey Lynn Primary, Western Springs College",
                     NearbyShops = "Grey Lynn shops, Westmere butchery & bakery",
-                    ImageUrl = "/images/property/beachside_house.jpg"
+                    ImageUrl = "/images/properties/beachside_house.jpg"
                 },
                 new Property
                 {
@@ -232,7 +232,7 @@ namespace Real_Estate_App.Data
                     IsAvailable = false,
                     NearbySchools = "Takapuna Primary, Takapuna Grammar",
                     NearbyShops = "Takapuna town centre, Shore City Mall",
-                    ImageUrl = "/images/property/flat_2.jpg"
+                    ImageUrl = "/images/properties/flat_2.jpg"
                 }
             );
 

@@ -70,6 +70,14 @@
         <label>Property Is Available for Viewing:</label>
         <strong asp-for="IsAvailable"> @(Model.IsAvailable ? "Yes" : "No")</strong>
     </div>
+
+    <div class="list-group-item">
+        <label>Property Image: </label>
+        <img src="@Model.ImageUrl" />
+    </div>
+
+
+
 </div>
 
 <a asp-action="Index" asp-route-id="@Model.PropertyId" class="btn btn-sm btn-outline-primary"> <i class="bi bi-arrow-left"></i> Go back to Property List</a>

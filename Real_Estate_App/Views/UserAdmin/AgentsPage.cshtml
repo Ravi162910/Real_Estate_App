@@ -76,11 +76,11 @@
 
 
 
-        <form asp-action="AgentApproveRequest" method="post" asp-route-id="@requestmade.PropertyRequestID">
+    <form asp-action="AgentApproveRequest" method="post" enctype="multipart/form-data" asp-route-id="@requestmade.PropertyRequestID">
             <input asp-for="@requestmade.PropertyRequestID" type="hidden" />
             <button type="submit" class="btn btn-success">Approve</button>
         </form>
-        <form asp-action="AgentRejectRequest" method="post" asp-route-id="@requestmade.PropertyRequestID">
+    <form asp-action="AgentRejectRequest" method="post" enctype="multipart/form-data" asp-route-id="@requestmade.PropertyRequestID">
              <input asp-for="@requestmade.PropertyRequestID" type="hidden" />
             <button type="submit" class="btn btn-danger">Reject</button>
         </form>

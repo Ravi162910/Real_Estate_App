@@ -71,6 +71,12 @@
             <label>Property Is Available for Viewing:</label>
             <strong asp-for="IsAvailable"> @(Model.IsAvailable ? "Yes" : "No")</strong>
         </div>
+
+        <div class="list-group-item">
+            <label>Property Image: </label>
+            <img src="@Model.ImageUrl" />
+        </div>
+
     </div>
 
     <button type="submit" class="btn btn-danger">

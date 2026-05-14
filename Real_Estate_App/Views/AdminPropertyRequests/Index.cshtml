@@ -78,11 +78,11 @@
 
 
 
-        <form asp-action="AdminApproveRequest" method="post" asp-route-id="@requests.PropertyRequestID">
+    <form asp-action="AdminApproveRequest" method="post" enctype="multipart/form-data" asp-route-id="@requests.PropertyRequestID">
             <input asp-for="@requests.PropertyRequestID" type="hidden" />
             <button type="submit" class="btn btn-success">Add as a property (Approve)</button>
         </form>
-        <form asp-action="AdminRejectRequest" method="post" asp-route-id="@requests.PropertyRequestID">
+    <form asp-action="AdminRejectRequest" method="post" enctype="multipart/form-data" asp-route-id="@requests.PropertyRequestID">
             <input asp-for="@requests.PropertyRequestID" type="hidden" />
             <button type="submit" class="btn btn-danger mb-3">Reject</button>
         </form>

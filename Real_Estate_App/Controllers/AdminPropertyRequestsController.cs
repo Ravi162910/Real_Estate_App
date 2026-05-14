@@ -53,6 +53,7 @@ namespace Real_Estate_App.Controllers
                 NearbySchools = request.Request_NearbySchools,
                 NearbyShops = request.Request_NearbyShops,
                 PropertyPets = request.Property_Pets,
+                ImageUrl = request.ImageUrl,
             };
 
             await _unitofWork.Properties.AddAsync(newproperty);
