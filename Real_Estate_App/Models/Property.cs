@@ -67,5 +67,7 @@ namespace Real_Estate_App.Models
         public List<Viewing>? Viewings_list { get; set; }// One
 
         public List<OpenHome> OpenHomes { get; set; }
+
+        public string? ImageUrl { get; set; }
     }
 }

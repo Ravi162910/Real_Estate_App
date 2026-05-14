@@ -64,5 +64,9 @@ namespace Real_Estate_App.Models
         public string Requeststatus { get; set; }
 
         public DateTime Requestcreatedat { get; set; }
+
+        [Display(Name = "Image URL for Property Photo")]
+        [Required(ErrorMessage = "A Property photo is required.")]
+        public string? ImageUrl { get; set; }
     }
 }

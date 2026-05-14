@@ -1,6 +1,6 @@
 ﻿@model PropertyRequest
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
 
     <div class="card border-2 mt-4 mb-3 shadow">
         <div class="card-header bg-secondary py-4">
@@ -76,6 +76,12 @@
         <label asp-for="Request_NearbyShops"></label>
         <input asp-for="@Model.Request_NearbyShops" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="Request_NearbyShops" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ImageUrl"></label>
+        <input name="file" class="form-control border-3 shadow" type="file" />
+        <span asp-validation-for="ImageUrl" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary mt-2">Submit this request</button>

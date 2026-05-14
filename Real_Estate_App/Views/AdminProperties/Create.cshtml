@@ -11,7 +11,7 @@
     </div>
 </div>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     <div class="mb-3">
         <label asp-for="PropertyName"></label>
         <input asp-for="PropertyName" class="form-control border-3 shadow" type="text" />
@@ -82,6 +82,12 @@
         <label asp-for="NearbyShops"></label>
         <input asp-for="NearbyShops" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="NearbyShops" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ImageUrl"></label>
+        <input name="file" class="form-control border-3 shadow" type="file" />
+        <span asp-validation-for="ImageUrl" class="text-danger"></span>
     </div>
 
     <div class="mb-3">

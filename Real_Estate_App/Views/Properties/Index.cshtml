@@ -119,13 +119,15 @@ else
                             <strong>Bedrooms:</strong> @item.PropertyBedrooms |
                             <strong>Bathrooms:</strong> @item.PropertyBathrooms<br />
                             <strong>Price:</strong> @item.Price.ToString("C")<br />
+                            <strong class="">Property Image: </strong>
+                            <img src="@item.ImageUrl" class="mt-3" style="max-width:300px; height:auto;" />
                             @if (@item.OpenHomes.Any())
                             {
-                                <span class="badge bg-success">Open Home Available</span>
+                                <span class="badge bg-success">Open Home Available</span><br />
                             }
                             else
                             {
-                                <span class="badge bg-danger">No Open Homes available</span>
+                                <span class="badge bg-danger">No Open Homes available</span><br />
                             }
                         </p>
                     </div>

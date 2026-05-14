@@ -14,10 +14,13 @@ namespace Real_Estate_App.Controllers
     {
         public readonly AppDbContext _appDbContext;
         private readonly IUnitOfWork _unitofwork;
-        public AdminPropertiesController(AppDbContext appDbContext, IUnitOfWork unitOfWork) 
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public AdminPropertiesController(AppDbContext appDbContext, IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment) 
         {
             _appDbContext = appDbContext;
             _unitofwork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public async Task<IActionResult> Index(string? searchString, string? propertyType,
@@ -62,9 +65,31 @@ namespace Real_Estate_App.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Models.Property property)
+        public async Task<ActionResult> Create(Models.Property property, IFormFile file)
         {
-            if (ModelState.IsValid) 
+            if (file != null && file.Length > 0)
+            {
+                string wwwrootpath = _webHostEnvironment.WebRootPath;
+
+                string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+
+                string adminpath = Path.Combine(wwwrootpath, "images", "admin_properties");
+
+                if (!Directory.Exists(adminpath))
+                {
+                    Directory.CreateDirectory(adminpath);
+                }
+
+                using (var filestream = new FileStream(Path.Combine(adminpath, filename), FileMode.Create))
+                {
+                    await file.CopyToAsync(filestream);
+                }
+
+                property.ImageUrl = "/images/admin_properties/" + filename;
+            }
+
+            ModelState.Remove("OpenHomes");// temp fix to ignore checking for openhome data, before doing the ModelState.IsValid check
+            if (ModelState.IsValid) // fails due to no openhome data
             {
                 _unitofwork.Properties.AddAsync(property);
                 _unitofwork.SaveChanges();
@@ -92,8 +117,41 @@ namespace Real_Estate_App.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Models.Property property)
+        public async Task<ActionResult> Edit(Models.Property property, IFormFile? file)
         {
+            if (file != null && file.Length > 0)
+            {
+                string wwwrootpath = _webHostEnvironment.WebRootPath;
+
+                if (!string.IsNullOrEmpty(property.ImageUrl)) 
+                {
+                    string oldimagepath = Path.Combine(wwwrootpath, property.ImageUrl.TrimStart('/'));
+
+                    if (System.IO.File.Exists(oldimagepath)) 
+                    {
+                        System.IO.File.Delete(oldimagepath);
+                    }
+                }
+
+                string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+
+                string adminpath = Path.Combine(wwwrootpath, "images", "admin_properties");
+
+                if (!Directory.Exists(adminpath))
+                {
+                    Directory.CreateDirectory(adminpath);
+                }
+
+                using (var filestream = new FileStream(Path.Combine(adminpath, filename), FileMode.Create))
+                {
+                    await file.CopyToAsync(filestream);
+                }
+
+                property.ImageUrl = "/images/admin_properties/" + filename;
+            }
+
+
+            ModelState.Remove("OpenHomes");
             if (ModelState.IsValid) 
             {
                 _unitofwork.Properties.Update(property);
