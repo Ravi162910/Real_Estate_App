@@ -10,8 +10,9 @@
     </div>
 </div>
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
     <input type="hidden" asp-for="PropertyId"/>
+    <input type="hidden" asp-for="ImageUrl" />
     <div class="mb-3">
         <label asp-for="PropertyName"></label>
         <input asp-for="PropertyName" class="form-control border-3 shadow" type="text" />
@@ -84,6 +85,18 @@
         <input asp-for="NearbyShops" class="form-control border-3 shadow" type="text" />
         <span asp-validation-for="NearbyShops" class="text-danger"></span>
     </div>
+
+    <div class="mb-3">
+        <label>Saved image:</label>
+        <img src="@Model.ImageUrl" />
+    </div>
+
+    <div class="mb-3">
+        <label> Change image here</label>
+        <input name="file" class="form-control border-3 shadow" type="file" />
+        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+    </div>
+
 
     <div class="mb-3">
         <label asp-for="IsAvailable"></label>

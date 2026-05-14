@@ -69,15 +69,22 @@
                 <label>Property Nearby Shops:</label>
                 <strong asp-for="NearbyShops"> @requests.Request_NearbyShops</strong>
             </div>
+            <div class="list-group-item">
+                <label>Property Image:</label>
+                <img src="@requests.ImageUrl" />
+            </div>
         </div>
+
+
+
 
         <form asp-action="AdminApproveRequest" method="post" asp-route-id="@requests.PropertyRequestID">
             <input asp-for="@requests.PropertyRequestID" type="hidden" />
             <button type="submit" class="btn btn-success">Add as a property (Approve)</button>
-            <form asp-action="AdminRejectRequest" method="post" asp-route-id="@requests.PropertyRequestID">
-                <input asp-for="@requests.PropertyRequestID" type="hidden" />
-                <button type="submit" class="btn btn-danger">Reject</button>
-            </form>
+        </form>
+        <form asp-action="AdminRejectRequest" method="post" asp-route-id="@requests.PropertyRequestID">
+            <input asp-for="@requests.PropertyRequestID" type="hidden" />
+            <button type="submit" class="btn btn-danger mb-3">Reject</button>
         </form>
 }
 

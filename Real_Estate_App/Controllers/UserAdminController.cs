@@ -24,12 +24,14 @@ namespace Real_Estate_App.Controllers
         private readonly AppDbContext _context;
         private readonly IPasswordHasher<User_Data> _passwordHasher;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public UserAdminController(AppDbContext context, IPasswordHasher<User_Data> passwordHasher, IUnitOfWork unitOfWork)
+        public UserAdminController(AppDbContext context, IPasswordHasher<User_Data> passwordHasher, IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _passwordHasher = passwordHasher;
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Registration()
@@ -130,11 +132,7 @@ namespace Real_Estate_App.Controllers
             // Build claims based on IsAdmin flag instead of hardcoded username comparison
             string claimrole;
 
-            if (useroradmin.IsAdmin)
-            {
-                claimrole = "Admin";
-            }// May need to remove or replace this
-            else if (useroradmin.IsAgent)
+            if (useroradmin.IsAgent)
             {
                 claimrole = "Agent";
             }
@@ -240,13 +238,34 @@ namespace Real_Estate_App.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "User")]
-        public async Task<IActionResult> RequestfromUser(PropertyRequest propertyRequestobj)
+        public async Task<IActionResult> RequestfromUser(PropertyRequest propertyRequestobj, IFormFile file)
         {
             propertyRequestobj.Requeststatus = "PendingAgent";
             propertyRequestobj.Requestcreatedat = DateTime.Now;
 
             var User_ID = int.Parse(User.FindFirst("UserID").Value);
             propertyRequestobj.UserID = User_ID;
+
+            if (file != null && file.Length > 0) 
+            {
+                string wwwrootpath = _webHostEnvironment.WebRootPath;
+
+                string filename = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+
+                string requestpath = Path.Combine(wwwrootpath,  "images", "requests");
+
+                if (!Directory.Exists(requestpath)) 
+                {
+                    Directory.CreateDirectory(requestpath);
+                }
+
+                using (var filestream = new FileStream(Path.Combine(requestpath, filename), FileMode.Create)) 
+                {
+                    await file.CopyToAsync(filestream);
+                }
+
+                propertyRequestobj.ImageUrl = "/images/requests/" + filename;
+            }
 
             await _unitOfWork.PropertyRequest.AddAsync(propertyRequestobj);
             await _unitOfWork.SaveChangesAsync();
