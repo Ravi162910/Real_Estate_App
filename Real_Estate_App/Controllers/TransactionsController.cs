@@ -1,30 +1,34 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Real_Estate_App.Data;
 using Real_Estate_App.Models;
 using Real_Estate_App.Services;
 using Real_Estate_App.UnitOfWork;
+using Stripe;
 
 namespace Real_Estate_App.Controllers
 {
     public class TransactionsController : Controller
     {
-        private readonly IEmailService _emailService;
         private readonly ILogger<TransactionsController> _logger;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMemoryCache _cache;
+        private readonly IStripeService _stripeService;
+        private readonly ICheckoutFulfillmentService _fulfillment;
 
-        public TransactionsController(IEmailService emailService, ILogger<TransactionsController> logger, IUnitOfWork unitOfWork, IMemoryCache cache)
+        public TransactionsController(
+            ILogger<TransactionsController> logger,
+            IUnitOfWork unitOfWork,
+            IStripeService stripeService,
+            ICheckoutFulfillmentService fulfillment)
         {
-            _emailService = emailService;
             _logger = logger;
             _unitOfWork = unitOfWork;
-            _cache = cache;
+            _stripeService = stripeService;
+            _fulfillment = fulfillment;
         }
 
         // GET: Transactions/Checkout/5
+        // Collects buyer contact details only. Card data is never entered
+        // here - the buyer is sent to Stripe's hosted page for that.
         public async Task<IActionResult> Checkout(int id)
         {
             var property = await _unitOfWork.Properties.GetByIdAsync(id);
@@ -39,24 +43,21 @@ namespace Real_Estate_App.Controllers
                 return RedirectToAction("Details", "Properties", new { id });
             }
 
-            var submitToken = Guid.NewGuid().ToString("N");
-            _cache.Set(SubmitTokenKey(submitToken), true, TimeSpan.FromMinutes(30));
-
             var viewModel = new CheckoutViewModel
             {
                 PropertyId = property.PropertyId,
                 PropertyName = property.PropertyName,
                 PropertyAddress = property.PropertyAddress,
-                Price = property.Price,
-                SubmitToken = submitToken
+                Price = property.Price
             };
 
             return View(viewModel);
         }
 
         // POST: Transactions/Checkout
-        // Creates a Pending transaction; the property stays available until a
-        // Transaction Admin approves it from the queue.
+        // Validates buyer details, then creates a Stripe Checkout Session and
+        // redirects to Stripe. No Transaction row is created until the payment
+        // is confirmed (success redirect or webhook).
         [HttpPost]
         [ValidateAntiForgeryToken]
         [EnableRateLimiting("checkout")]
@@ -66,16 +67,6 @@ namespace Real_Estate_App.Controllers
             {
                 return View(model);
             }
-
-            // Consume the one-shot submit token. If it's missing/already-used,
-            // this is a duplicate submission (refresh, double-click, back+submit).
-            var tokenKey = SubmitTokenKey(model.SubmitToken);
-            if (string.IsNullOrEmpty(model.SubmitToken) || !_cache.TryGetValue(tokenKey, out _))
-            {
-                TempData["Error"] = "This checkout has already been submitted. Please start a new purchase if you'd like to try again.";
-                return RedirectToAction("Details", "Properties", new { id = model.PropertyId });
-            }
-            _cache.Remove(tokenKey);
 
             var property = await _unitOfWork.Properties.GetByIdAsync(model.PropertyId);
             if (property == null)
@@ -89,48 +80,93 @@ namespace Real_Estate_App.Controllers
                 return RedirectToAction("Details", "Properties", new { id = model.PropertyId });
             }
 
-            // Link the transaction to the buyer's account if they're logged in.
-            // Anonymous buyers still get a row, with UserId = 0.
+            if (!_stripeService.IsConfigured)
+            {
+                _logger.LogError("Stripe is not configured - cannot start checkout.");
+                TempData["Error"] = "Online payments are temporarily unavailable. Please try again later.";
+                return RedirectToAction("Details", "Properties", new { id = model.PropertyId });
+            }
+
+            // Link the purchase to the buyer's account if they're logged in.
             int buyerUserId = int.TryParse(User.FindFirst("UserID")?.Value, out var uid) ? uid : 0;
 
-            var transaction = new Transaction
-            {
-                PropertyId = model.PropertyId,
-                UserId = buyerUserId,
-                Price = property.Price,
-                UserEmail = model.UserEmail,
-                BuyerName = model.BuyerName,
-                PurchaseDate = DateTime.UtcNow,
-                Status = Transaction.StatusPending
-            };
-
-            await _unitOfWork.Transactions.AddAsync(transaction);
-            await _unitOfWork.SaveChangesAsync();
+            // Both URLs are built server-side from our own routes - never from
+            // user input - so this can't be turned into an open redirect.
+            var successUrl = Url.Action(nameof(Success), "Transactions", null, Request.Scheme)
+                             + "?session_id={CHECKOUT_SESSION_ID}";
+            var cancelUrl = Url.Action("Details", "Properties",
+                                new { id = model.PropertyId }, Request.Scheme)!;
 
             try
             {
-                var sent = await _emailService.SendPurchaseRequestReceivedAsync(
-                    model.UserEmail,
-                    model.BuyerName,
-                    property.PropertyName,
-                    property.PropertyAddress,
-                    property.Price,
-                    transaction.PurchaseDate
-                );
-                TempData["EmailSent"] = sent;
+                var session = await _stripeService.CreateCheckoutSessionAsync(
+                    property, model, buyerUserId, successUrl, cancelUrl);
+
+                return Redirect(session.Url);
             }
-            catch (Exception ex)
+            catch (StripeException ex)
             {
-                _logger.LogError(ex, "Email notification failed for transaction {TransactionId}", transaction.TransactionId);
-                TempData["EmailSent"] = false;
+                _logger.LogError(ex, "Stripe failed to create a checkout session for property {PropertyId}",
+                    model.PropertyId);
+                TempData["Error"] = "We couldn't start the payment. Please try again.";
+                return RedirectToAction("Details", "Properties", new { id = model.PropertyId });
+            }
+        }
+
+        // GET: Transactions/Success?session_id=cs_test_...
+        // Stripe redirects here after a successful payment. We re-fetch the
+        // session from Stripe (never trust the query string for paid state)
+        // and fulfil it idempotently.
+        public async Task<IActionResult> Success(string? session_id)
+        {
+            if (string.IsNullOrWhiteSpace(session_id))
+            {
+                return NotFound();
             }
 
-            // One-time token so an anonymous buyer can view their receipt without
-            // exposing the Confirmation page to ID enumeration.
-            var confirmToken = Guid.NewGuid().ToString("N");
-            TempData[ConfirmTokenKey(transaction.TransactionId)] = confirmToken;
+            Stripe.Checkout.Session session;
+            try
+            {
+                session = await _stripeService.GetSessionAsync(session_id);
+            }
+            catch (StripeException ex)
+            {
+                _logger.LogWarning(ex, "Could not retrieve Stripe session {SessionId}", session_id);
+                return NotFound();
+            }
 
-            return RedirectToAction(nameof(Confirmation), new { id = transaction.TransactionId, token = confirmToken });
+            var result = await _fulfillment.FulfillAsync(session);
+
+            switch (result.Outcome)
+            {
+                case FulfillmentOutcome.Created:
+                case FulfillmentOutcome.AlreadyExists:
+                    var transaction = result.Transaction!;
+                    // One-time token so an anonymous buyer can view the receipt
+                    // without exposing Confirmation to id enumeration.
+                    var confirmToken = Guid.NewGuid().ToString("N");
+                    TempData[ConfirmTokenKey(transaction.TransactionId)] = confirmToken;
+                    TempData["EmailSent"] = result.Outcome == FulfillmentOutcome.Created;
+                    return RedirectToAction(nameof(Confirmation),
+                        new { id = transaction.TransactionId, token = confirmToken });
+
+                case FulfillmentOutcome.NotPaid:
+                    TempData["Error"] = "Your payment was not completed. No purchase request was created.";
+                    break;
+                case FulfillmentOutcome.AmountMismatch:
+                    TempData["Error"] = "There was a pricing mismatch on this payment. Please contact support.";
+                    break;
+                default:
+                    TempData["Error"] = "This property is no longer available.";
+                    break;
+            }
+
+            var propertyId = session.ClientReferenceId;
+            if (int.TryParse(propertyId, out var pid))
+            {
+                return RedirectToAction("Details", "Properties", new { id = pid });
+            }
+            return RedirectToAction("Index", "Properties");
         }
 
         // GET: Transactions/Confirmation/5
@@ -169,7 +205,5 @@ namespace Real_Estate_App.Controllers
         }
 
         private static string ConfirmTokenKey(int transactionId) => $"ConfirmToken_{transactionId}";
-
-        private static string SubmitTokenKey(string token) => $"checkout-submit:{token}";
     }
 }

@@ -53,6 +53,20 @@ namespace Real_Estate_App.Models
         [Display(Name = "Rejection Reason")]
         public string? RejectionReason { get; set; }
 
+        // Stripe Checkout Session id ("cs_test_...") that authorized this row.
+        // Used to make fulfilment idempotent: the success redirect and the
+        // webhook can both arrive, but only one Transaction is created.
+        [MaxLength(255)]
+        [Display(Name = "Stripe Session")]
+        public string? StripeSessionId { get; set; }
+
+        // PaymentIntent ("pi_...") behind the session. The buyer's card is
+        // authorized (held) against this; admin Approve captures it, admin
+        // Reject cancels it. Null for legacy/non-Stripe rows.
+        [MaxLength(255)]
+        [Display(Name = "Stripe Payment")]
+        public string? StripePaymentIntentId { get; set; }
+
         [ForeignKey("PropertyId")]
         public Property? Property { get; set; }
     }

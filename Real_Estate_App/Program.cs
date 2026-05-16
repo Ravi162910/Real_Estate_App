@@ -32,6 +32,17 @@ builder.Services.AddSingleton<IPasswordHasher<User_Data>, PasswordHasher<User_Da
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddMemoryCache();
+
+// Stripe: bind the "Stripe" config section and register the payment
+// services. The secret key is applied process-wide for Stripe.net.
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+builder.Services.AddScoped<IStripeService, StripeService>();
+builder.Services.AddScoped<ICheckoutFulfillmentService, CheckoutFulfillmentService>();
+var stripeSecretKey = builder.Configuration["Stripe:SecretKey"];
+if (!string.IsNullOrWhiteSpace(stripeSecretKey))
+{
+    Stripe.StripeConfiguration.ApiKey = stripeSecretKey;
+}
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -212,6 +223,9 @@ app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Attribute-routed controllers (e.g. the Stripe webhook at /stripe/webhook).
+app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",

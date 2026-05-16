@@ -28,7 +28,7 @@ namespace Real_Estate_App.Services
                 heading: "Purchase Request Received",
                 headingColor: "#2c3e50",
                 buyerName: buyerName,
-                introHtml: "<p>Thank you for your purchase request! Your request is now <strong>awaiting review</strong> by one of our Transaction Admins.</p><p>You will receive a follow-up email once a decision has been made.</p>",
+                introHtml: "<p>Thank you for your purchase request! Your card has been <strong>authorized but not charged</strong> - a hold is in place for the amount below.</p><p>Your request is now <strong>awaiting review</strong> by one of our Transaction Admins. You will only be charged if it is approved; if it is declined, the hold is released automatically. You will receive a follow-up email once a decision has been made.</p>",
                 statusLabel: "Pending Approval",
                 statusColor: "#f39c12",
                 propertyName: propertyName,
