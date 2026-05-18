@@ -8,6 +8,8 @@ namespace Real_Estate_App.Services
         Task<bool> SendPurchaseRequestReceivedAsync(string toEmail, string buyerName, string propertyName, string propertyAddress, decimal price, DateTime requestDate);
         Task<bool> SendPurchaseApprovedAsync(string toEmail, string buyerName, string propertyName, string propertyAddress, decimal price, DateTime approvedDate);
         Task<bool> SendPurchaseRejectedAsync(string toEmail, string buyerName, string propertyName, string propertyAddress, decimal price, DateTime rejectedDate, string? reason);
+        Task<bool> SendContactNotificationAsync(string supportEmail, string senderName, string senderEmail, string problem, string comments, DateTime submittedDate);
+        Task<bool> SendContactAcknowledgementAsync(string toEmail, string senderName, string problem);
     }
 
     public class EmailService : IEmailService
@@ -81,6 +83,65 @@ namespace Real_Estate_App.Services
             return SendAsync(toEmail, subject, body);
         }
 
+        public Task<bool> SendContactNotificationAsync(string supportEmail, string senderName, string senderEmail, string problem, string comments, DateTime submittedDate)
+        {
+            var displayDate = DateTime.SpecifyKind(submittedDate, DateTimeKind.Utc).ToLocalTime();
+            var subject = $"New Contact Request - {problem}";
+            var body = $@"
+<html>
+<body style='font-family: Arial, sans-serif; color: #333;'>
+    <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
+        <h1 style='color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 10px;'>New Contact Request</h1>
+        <p>A visitor submitted the contact form. Reply directly to this email to respond to them.</p>
+        <div style='background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;'>
+            <table style='width: 100%; border-collapse: collapse;'>
+                <tr>
+                    <td style='padding: 8px 0; font-weight: bold; width: 140px;'>From:</td>
+                    <td style='padding: 8px 0;'>{System.Net.WebUtility.HtmlEncode(senderName)}</td>
+                </tr>
+                <tr>
+                    <td style='padding: 8px 0; font-weight: bold;'>Email:</td>
+                    <td style='padding: 8px 0;'>{System.Net.WebUtility.HtmlEncode(senderEmail)}</td>
+                </tr>
+                <tr>
+                    <td style='padding: 8px 0; font-weight: bold;'>Topic:</td>
+                    <td style='padding: 8px 0;'>{System.Net.WebUtility.HtmlEncode(problem)}</td>
+                </tr>
+                <tr>
+                    <td style='padding: 8px 0; font-weight: bold;'>Submitted:</td>
+                    <td style='padding: 8px 0;'>{displayDate:dddd, dd MMMM yyyy HH:mm}</td>
+                </tr>
+            </table>
+        </div>
+        <h2 style='color: #2c3e50;'>Message</h2>
+        <div style='background-color: #fff; border-left: 4px solid #2c3e50; padding: 12px 16px; margin: 10px 0; white-space: pre-wrap;'>{System.Net.WebUtility.HtmlEncode(comments)}</div>
+        <hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;' />
+        <p style='color: #888; font-size: 12px;'>This is an automated message from Real Estate App.</p>
+    </div>
+</body>
+</html>";
+            return SendAsync(supportEmail, subject, body, replyTo: senderEmail);
+        }
+
+        public Task<bool> SendContactAcknowledgementAsync(string toEmail, string senderName, string problem)
+        {
+            var subject = "We received your message - Real Estate App";
+            var body = $@"
+<html>
+<body style='font-family: Arial, sans-serif; color: #333;'>
+    <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
+        <h1 style='color: #2c3e50; border-bottom: 2px solid #2c3e50; padding-bottom: 10px;'>Thanks for getting in touch</h1>
+        <p>Dear <strong>{System.Net.WebUtility.HtmlEncode(senderName)}</strong>,</p>
+        <p>We have received your message regarding <strong>{System.Net.WebUtility.HtmlEncode(problem)}</strong>. Our team will be in touch with you shortly.</p>
+        <p>You do not need to do anything further - this email is just to confirm we got your request.</p>
+        <hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;' />
+        <p style='color: #888; font-size: 12px;'>This is an automated message from Real Estate App. Please do not reply directly to this email.</p>
+    </div>
+</body>
+</html>";
+            return SendAsync(toEmail, subject, body);
+        }
+
         private string BuildShell(string heading, string headingColor, string buyerName, string introHtml, string statusLabel, string statusColor, string propertyName, string propertyAddress, decimal price, DateTime date, string dateLabel, string? extraHtml)
         {
             // Dates are stored as UTC; SpecifyKind handles values loaded from EF
@@ -133,7 +194,7 @@ namespace Real_Estate_App.Services
 </html>";
         }
 
-        private async Task<bool> SendAsync(string toEmail, string subject, string htmlBody)
+        private async Task<bool> SendAsync(string toEmail, string subject, string htmlBody, string? replyTo = null)
         {
             var smtpSettings = _configuration.GetSection("SmtpSettings");
             var host = smtpSettings["Host"] ?? "smtp.gmail.com";
@@ -162,6 +223,10 @@ namespace Real_Estate_App.Services
                     IsBodyHtml = true
                 };
                 mailMessage.To.Add(toEmail);
+                if (!string.IsNullOrWhiteSpace(replyTo))
+                {
+                    mailMessage.ReplyToList.Add(new MailAddress(replyTo));
+                }
 
                 await client.SendMailAsync(mailMessage);
                 _logger.LogInformation("Email sent to {Email}: {Subject}", toEmail, subject);
