@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 using Real_Estate_App.UnitOfWork;
 using Real_Estate_App.Repositories;
+using Real_Estate_App.Services;
 
 namespace Real_Estate_App.Controllers
 {
@@ -240,6 +241,12 @@ namespace Real_Estate_App.Controllers
         [Authorize(Roles = "User")]
         public async Task<IActionResult> RequestfromUser(PropertyRequest propertyRequestobj, IFormFile file)
         {
+            if (!ImageUploadValidator.IsValid(file, out var imageError))
+            {
+                TempData["error"] = imageError;
+                return View(propertyRequestobj);
+            }
+
             propertyRequestobj.Requeststatus = "PendingAgent";
             propertyRequestobj.Requestcreatedat = DateTime.Now;
 

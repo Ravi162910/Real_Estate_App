@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Real_Estate_App.Data;
 using Real_Estate_App.Models;
+using Real_Estate_App.Services;
 using Real_Estate_App.UnitOfWork;
 
 namespace Real_Estate_App.Controllers
@@ -67,6 +68,19 @@ namespace Real_Estate_App.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Models.Property property, IFormFile file)
         {
+            if (!ImageUploadValidator.IsValid(file, out var imageError))
+            {
+                ModelState.AddModelError(nameof(property.ImageUrl), imageError);
+            }
+
+            ModelState.Remove("OpenHomes");// ignore openhome data before the ModelState.IsValid check
+            if (!ModelState.IsValid)
+            {
+                return View(property);
+            }
+
+            // Save the (validated) image only after the model passes, so a
+            // rejected submission never leaves an orphaned file on disk.
             if (file != null && file.Length > 0)
             {
                 string wwwrootpath = _webHostEnvironment.WebRootPath;
@@ -88,15 +102,10 @@ namespace Real_Estate_App.Controllers
                 property.ImageUrl = "/images/admin_properties/" + filename;
             }
 
-            ModelState.Remove("OpenHomes");// temp fix to ignore checking for openhome data, before doing the ModelState.IsValid check
-            if (ModelState.IsValid) // fails due to no openhome data
-            {
-                _unitofwork.Properties.AddAsync(property);
-                _unitofwork.SaveChanges();
-                TempData["success"] = "Property successfully added as an admin";
-                return RedirectToAction("Index");
-            }
-            return View(property);
+            _unitofwork.Properties.AddAsync(property);
+            _unitofwork.SaveChanges();
+            TempData["success"] = "Property successfully added as an admin";
+            return RedirectToAction("Index");
         }
 
 
@@ -119,15 +128,39 @@ namespace Real_Estate_App.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(Models.Property property, IFormFile? file)
         {
+            if (!ImageUploadValidator.IsValid(file, out var imageError))
+            {
+                ModelState.AddModelError(nameof(property.ImageUrl), imageError);
+            }
+
+            ModelState.Remove("OpenHomes");
+            if (!ModelState.IsValid)
+            {
+                return View(property);
+            }
+
+            // Load the tracked row so EF compares the [ConcurrencyCheck] on
+            // IsAvailable against its real database value. Updating the posted
+            // (disconnected) entity made EF use the *posted* IsAvailable as the
+            // concurrency "original", so toggling availability always matched 0
+            // rows and threw DbUpdateConcurrencyException.
+            var existing = await _unitofwork.Properties.GetByIdAsync(property.PropertyId);
+            if (existing == null)
+            {
+                return NotFound();
+            }
+
+            // Replace the saved image only when a new file is uploaded; delete
+            // the old file using the value on disk, not the posted one.
             if (file != null && file.Length > 0)
             {
                 string wwwrootpath = _webHostEnvironment.WebRootPath;
 
-                if (!string.IsNullOrEmpty(property.ImageUrl)) 
+                if (!string.IsNullOrEmpty(existing.ImageUrl))
                 {
-                    string oldimagepath = Path.Combine(wwwrootpath, property.ImageUrl.TrimStart('/'));
+                    string oldimagepath = Path.Combine(wwwrootpath, existing.ImageUrl.TrimStart('/'));
 
-                    if (System.IO.File.Exists(oldimagepath)) 
+                    if (System.IO.File.Exists(oldimagepath))
                     {
                         System.IO.File.Delete(oldimagepath);
                     }
@@ -147,19 +180,26 @@ namespace Real_Estate_App.Controllers
                     await file.CopyToAsync(filestream);
                 }
 
-                property.ImageUrl = "/images/admin_properties/" + filename;
+                existing.ImageUrl = "/images/admin_properties/" + filename;
             }
 
+            // Copy the editable fields from the posted model onto the tracked row.
+            existing.PropertyName = property.PropertyName;
+            existing.PropertyAddress = property.PropertyAddress;
+            existing.PropertyBedrooms = property.PropertyBedrooms;
+            existing.PropertyBathrooms = property.PropertyBathrooms;
+            existing.PropertyPets = property.PropertyPets;
+            existing.PropertyGarages = property.PropertyGarages;
+            existing.ExtendedDescription = property.ExtendedDescription;
+            existing.Price = property.Price;
+            existing.PropertyType = property.PropertyType;
+            existing.IsAvailable = property.IsAvailable;
+            existing.NearbySchools = property.NearbySchools;
+            existing.NearbyShops = property.NearbyShops;
 
-            ModelState.Remove("OpenHomes");
-            if (ModelState.IsValid) 
-            {
-                _unitofwork.Properties.Update(property);
-                _unitofwork.SaveChanges();
-                TempData["success"] = "Property successfully edited as an admin";
-                return RedirectToAction("Index");
-            }
-            return View();
+            _unitofwork.SaveChanges();
+            TempData["success"] = "Property successfully edited as an admin";
+            return RedirectToAction("Index");
         }
 
 
