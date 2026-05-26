@@ -7,7 +7,6 @@ using Real_Estate_App.Data;
 using Real_Estate_App.Models;
 using Real_Estate_App.Services;
 using Real_Estate_App.UnitOfWork;
-using System.Data.Common;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +16,16 @@ var builder = WebApplication.CreateBuilder(args);
 // "DefaultConnection" connection string set in App Service configuration.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString, sqlOptions =>
+        // Serverless Azure SQL auto-pauses when idle; the first connection after
+        // a pause can fail with transient errors (e.g. 40613 "database not
+        // currently available") while it resumes. Retry on those transient
+        // faults instead of letting startup crash with HTTP 500.30.
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 10,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null)));
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<IPasswordHasher<User_Data>, PasswordHasher<User_Data>>();
@@ -217,11 +225,15 @@ using (var scope = app.Services.CreateScope()) //Important for Seeding Database 
             await db.SaveChangesAsync();
         }
     }
-    catch (DbException)
+    catch (Exception ex)
     {
-        // Database not reachable (e.g. the connection string is not configured
-        // yet). Startup continues; migrations and seeding run on the next start
-        // once the database is available.
+        // Best-effort migration/seeding. If the database is still unreachable at
+        // startup - e.g. a paused serverless Azure SQL database that has not
+        // finished resuming after EnableRetryOnFailure exhausts its retries - do
+        // NOT take the whole site down (that surfaced as HTTP 500.30). Log and
+        // continue; migrations and seeding run on the next start, and the
+        // retrying execution strategy recovers once the database is available.
+        app.Logger.LogError(ex, "Startup database migration/seeding failed; continuing without it.");
     }
 }
 
