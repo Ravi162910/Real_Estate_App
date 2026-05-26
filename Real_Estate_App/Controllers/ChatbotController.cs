@@ -6,9 +6,13 @@ namespace Real_Estate_App.Controllers
 {
     public class ChatbotController : Controller
     {
+        // The chatbot is a site-wide widget (Shared/_Chatbotpartial, rendered in
+        // the layout on every page) - there is no standalone Chatbot page and no
+        // Views/Chatbot/Index.cshtml. Returning View() here threw a "view not
+        // found" 500, so redirect any direct hit on /Chatbot to the listings home.
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Properties");
         }
 
         // Topics the bot understands. Shown when greeting the user, when they

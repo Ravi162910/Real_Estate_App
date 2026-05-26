@@ -43,6 +43,17 @@ namespace Real_Estate_App.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
 
+            // A request with no Stripe-Signature header is never a real Stripe
+            // call. Reject it cleanly with 400 - without this guard, passing a
+            // null/empty header into ConstructEvent throws a non-StripeException
+            // that escapes the catch below and surfaces as a 500.
+            var signatureHeader = Request.Headers["Stripe-Signature"].ToString();
+            if (string.IsNullOrEmpty(signatureHeader))
+            {
+                _logger.LogWarning("Stripe webhook called without a Stripe-Signature header; rejecting.");
+                return BadRequest();
+            }
+
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
 
             Event stripeEvent;
@@ -53,7 +64,7 @@ namespace Real_Estate_App.Controllers
                 // so unauthenticated callers can't fabricate payments.
                 stripeEvent = EventUtility.ConstructEvent(
                     json,
-                    Request.Headers["Stripe-Signature"],
+                    signatureHeader,
                     _settings.WebhookSecret);
             }
             catch (StripeException ex)
