@@ -66,6 +66,11 @@ namespace Real_Estate_App.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        // Hard cap the request body at 5 MB so an oversized upload is rejected
+        // by the framework before it is buffered, not just by the post-read
+        // ImageUploadValidator check.
+        [RequestSizeLimit(ImageUploadValidator.MaxBytes)]
+        [RequestFormLimits(MultipartBodyLengthLimit = ImageUploadValidator.MaxBytes)]
         public async Task<ActionResult> Create(Models.Property property, IFormFile file)
         {
             if (!ImageUploadValidator.IsValid(file, out var imageError))
@@ -126,6 +131,8 @@ namespace Real_Estate_App.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestSizeLimit(ImageUploadValidator.MaxBytes)]
+        [RequestFormLimits(MultipartBodyLengthLimit = ImageUploadValidator.MaxBytes)]
         public async Task<ActionResult> Edit(Models.Property property, IFormFile? file)
         {
             if (!ImageUploadValidator.IsValid(file, out var imageError))

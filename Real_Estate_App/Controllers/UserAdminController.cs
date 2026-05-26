@@ -239,6 +239,10 @@ namespace Real_Estate_App.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "User")]
+        // Hard cap the request body at 5 MB (matches ImageUploadValidator.MaxBytes)
+        // so oversized uploads are rejected by the framework before buffering.
+        [RequestSizeLimit(ImageUploadValidator.MaxBytes)]
+        [RequestFormLimits(MultipartBodyLengthLimit = ImageUploadValidator.MaxBytes)]
         public async Task<IActionResult> RequestfromUser(PropertyRequest propertyRequestobj, IFormFile file)
         {
             if (!ImageUploadValidator.IsValid(file, out var imageError))
