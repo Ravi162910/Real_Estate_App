@@ -96,32 +96,6 @@ else
                         }
                     </td>
                 </tr>
-
-                @if (item.Status == Real_Estate_App.Models.Transaction.StatusPending)
-                {
-                    <div class="modal fade" id="rejectModal-@item.TransactionId" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <form asp-action="Reject" asp-route-id="@item.TransactionId" method="post" class="modal-content">
-                                @Html.AntiForgeryToken()
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Reject Purchase Request #@item.TransactionId</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Reject the request from <strong>@item.BuyerName</strong> for <strong>@item.Property?.PropertyName</strong>?</p>
-                                    <div class="mb-2">
-                                        <label class="form-label">Reason (optional, included in the buyer's email)</label>
-                                        <textarea name="rejectionReason" class="form-control" rows="3" maxlength="500" placeholder="e.g. Buyer did not pass the financial pre-check."></textarea>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-danger">Confirm Rejection</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                }
             }
         </tbody>
     </table>
@@ -132,3 +106,33 @@ else
         <i class="bi bi-arrow-left" style="vertical-align:middle"></i> Browse Properties
     </a>
 </div>
+
+@* Reject confirmation modals. Rendered here, OUTSIDE the table: a modal placed
+   inside <tbody> is invalid HTML, so the browser relocates ("foster-parents") it
+   and flattens its structure - which made the dialog render oddly and dismiss on
+   any click. The Reject buttons above target these by id. *@
+@foreach (var item in Model.Where(t => t.Status == Real_Estate_App.Models.Transaction.StatusPending))
+{
+    <div class="modal fade" id="rejectModal-@item.TransactionId" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form asp-action="Reject" asp-route-id="@item.TransactionId" method="post" class="modal-content">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Reject Purchase Request #@item.TransactionId</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Reject the request from <strong>@item.BuyerName</strong> for <strong>@item.Property?.PropertyName</strong>?</p>
+                    <div class="mb-2">
+                        <label class="form-label">Reason (optional, included in the buyer's email)</label>
+                        <textarea name="rejectionReason" class="form-control" rows="3" maxlength="500" placeholder="e.g. Buyer did not pass the financial pre-check."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
