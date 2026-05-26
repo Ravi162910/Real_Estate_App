@@ -20,3 +20,31 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Responsive images: never let an image render wider than its container.
+   This is the baseline that keeps property photos from overflowing cards
+   and breaking the layout on phones and tablets. */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Uniform property thumbnails for the listing grids, so cards line up neatly
+   no matter what dimensions the source image has. object-fit: cover scales
+   and crops without stretching, which fixes the distorted/overflowing look. */
+.property-card-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Single-image displays (property details / edit / delete): cap the photo to a
+   sensible size on large screens, while the global img rule above still keeps
+   it from overflowing on small ones. */
+.property-detail-img {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  border-radius: 4px;
+}

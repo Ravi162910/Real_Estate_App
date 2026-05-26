@@ -55,6 +55,7 @@ namespace Real_Estate_App.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Viewing(int PropertyID, int UserID, Viewing viewingobj)
         {
             var userIdClaim = User.FindFirst("UserID")?.Value;
@@ -66,6 +67,26 @@ namespace Real_Estate_App.Controllers
             }
 
             int userID = int.Parse(userIdClaim);
+
+            // The property must exist, otherwise the insert hits a foreign-key
+            // violation and throws an unhandled 500.
+            var property = await _unitofwork.Properties.GetByIdAsync(PropertyID);
+            if (property == null)
+            {
+                TempData["error"] = "That property could not be found.";
+                return RedirectToAction("Index");
+            }
+
+            // [Required] does not catch a missing DateTime - a non-nullable value
+            // type defaults to 0001-01-01 - so validate the chosen time directly.
+            if (viewingobj.Viewing_TimeDate == default)
+            {
+                ModelState.AddModelError(nameof(viewingobj.Viewing_TimeDate), "Please choose a date and time for the viewing.");
+            }
+            else if (viewingobj.Viewing_TimeDate <= DateTime.Now)
+            {
+                ModelState.AddModelError(nameof(viewingobj.Viewing_TimeDate), "Please choose a date and time in the future.");
+            }
 
             if (ModelState.IsValid)
             {

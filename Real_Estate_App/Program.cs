@@ -13,19 +13,11 @@ using System.Threading.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Set "DatabaseProvider" to "SqlServer" or "Sqlite" in appsettings.Development.json
+// SQL Server only: LocalDB for local development, Azure SQL in production via the
+// "DefaultConnection" connection string set in App Service configuration.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var connectionStringSql = builder.Configuration.GetConnectionString("DefaultConnectionSQL");
-var provider = builder.Configuration["DatabaseProvider"];
 
-if (provider == "SqlServer")
-{
-    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionStringSql));
-}
-else
-{
-    builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
-}
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddSingleton<IPasswordHasher<User_Data>, PasswordHasher<User_Data>>();
@@ -105,10 +97,10 @@ using (var scope = app.Services.CreateScope()) //Important for Seeding Database 
         var db = services.GetRequiredService<AppDbContext>();
         var hasher = services.GetRequiredService<IPasswordHasher<User_Data>>();
 
-        if (provider != "SqlServer")
-        {
-            await db.Database.EnsureCreatedAsync();
-        }
+        // Apply any pending EF Core migrations on startup so a fresh database
+        // (e.g. a brand-new Azure SQL database) gets its schema and seed data
+        // automatically, with no manual "dotnet ef database update" step.
+        await db.Database.MigrateAsync();
 
         if (await db.Database.CanConnectAsync())
         {
@@ -154,6 +146,22 @@ using (var scope = app.Services.CreateScope()) //Important for Seeding Database 
                 }
                 await db.SaveChangesAsync();
             }
+
+            // Demo accounts: one admin per sub-role so each role's capabilities
+            // can be shown without manually promoting a user in the dashboard.
+            // Development only - these have known passwords, so we never seed
+            // them on a deployed (e.g. Azure) environment. Idempotent: each row
+            // is only inserted when its username is missing.
+            if (app.Environment.IsDevelopment())
+            {
+                await EnsureSeedUserAsync("PropertyAdmin", "Property", "Admin",
+                    "property.admin@realestate.local", "PropertyPassword",
+                    isAdmin: true, adminRole: "Property", isAgent: false);
+
+                await EnsureSeedUserAsync("TransactionAdmin", "Transaction", "Admin",
+                    "transaction.admin@realestate.local", "TransactionPassword",
+                    isAdmin: true, adminRole: "Transaction", isAgent: false);
+            }
         }
 
         if (!await db.UsersandAdminsset.AnyAsync(u => u.IsAgent)) 
@@ -183,10 +191,37 @@ using (var scope = app.Services.CreateScope()) //Important for Seeding Database 
             }
             await db.SaveChangesAsync();
         }
+
+        // Inserts a user row only when the username does not already exist.
+        // Keeps the demo-account seeding above idempotent across restarts.
+        async Task EnsureSeedUserAsync(string userName, string firstName, string lastName,
+            string email, string password, bool isAdmin, string? adminRole, bool isAgent)
+        {
+            if (await db.UsersandAdminsset.AnyAsync(u => u.UserName == userName))
+            {
+                return;
+            }
+
+            var user = new User_Data
+            {
+                First_Name = firstName,
+                Last_Name = lastName,
+                Email = email,
+                UserName = userName,
+                IsAdmin = isAdmin,
+                AdminRole = adminRole,
+                IsAgent = isAgent,
+            };
+            user.Password = hasher.HashPassword(user, password);
+            db.UsersandAdminsset.Add(user);
+            await db.SaveChangesAsync();
+        }
     }
     catch (DbException)
     {
-        // Schema not ready (migration pending). Ravi handles migrations after push.
+        // Database not reachable (e.g. the connection string is not configured
+        // yet). Startup continues; migrations and seeding run on the next start
+        // once the database is available.
     }
 }
 

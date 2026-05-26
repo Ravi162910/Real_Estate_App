@@ -1,7 +1,22 @@
 ﻿<script>
+    let chatWelcomed = false;
+
     function toggleChat() {
         const chat = document.getElementById("chat-container");
         chat.classList.toggle("open");
+
+        // On first open, greet the user and list what they can ask. The text
+        // comes from the server's greeting so the menu is defined in one place.
+        if (chat.classList.contains("open") && !chatWelcomed) {
+            chatWelcomed = true;
+            fetch('/Chatbot/Message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify('hello')
+            })
+                .then(res => res.json())
+                .then(data => addMessage(data.reply, "bot"));
+        }
     }
 
     function addMessage(text, sender) {

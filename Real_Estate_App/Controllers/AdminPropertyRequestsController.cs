@@ -7,6 +7,10 @@ using Real_Estate_App.UnitOfWork;
 
 namespace Real_Estate_App.Controllers
 {
+    // Admin-only: the Index listing exposes pending property requests and the
+    // requesting users' details, so the whole controller is gated (previously
+    // only the POST actions were, leaving the listing publicly readable).
+    [Authorize(Roles = "Admin")]
     public class AdminPropertyRequestsController : Controller
     {
         private readonly IUnitOfWork _unitofWork;
@@ -28,7 +32,6 @@ namespace Real_Estate_App.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AdminApproveRequest(int ID)
         {
@@ -66,7 +69,6 @@ namespace Real_Estate_App.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AdminRejectRequest(int ID)
         {
