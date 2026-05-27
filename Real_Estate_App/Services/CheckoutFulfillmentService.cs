@@ -12,7 +12,8 @@ namespace Real_Estate_App.Services
         AlreadyExists,  // this session was already fulfilled (idempotent hit)
         NotPaid,        // session is not in a paid state - nothing created
         PropertyGone,   // property no longer exists / not available
-        AmountMismatch  // session total doesn't match the current price
+        AmountMismatch, // session total doesn't match the current price
+        AlreadySold     // property already has an approved sale - buyer released/refunded
     }
 
     public record FulfillmentResult(FulfillmentOutcome Outcome, Transaction? Transaction);
@@ -127,6 +128,30 @@ namespace Real_Estate_App.Services
                         "Session {SessionId} authorized {Got} != expected {Expected} for property {PropertyId}",
                         session.Id, paymentIntent.Amount, expected, propertyId);
                     return new FulfillmentResult(FulfillmentOutcome.AmountMismatch, null);
+                }
+
+                // Never sell the same property twice. If it already has an
+                // approved sale (e.g. an admin unhid/re-listed a property that
+                // was already sold), do NOT create another purchase request -
+                // release the buyer's hold (or refund if it was somehow already
+                // captured) so they are never charged for an unavailable home.
+                if (await _unitOfWork.Transactions.HasApprovedForPropertyAsync(property.PropertyId))
+                {
+                    try
+                    {
+                        await _stripeService.ReleaseOrRefundAsync(paymentIntent.Id);
+                    }
+                    catch (StripeException ex)
+                    {
+                        _logger.LogError(ex,
+                            "Failed to release/refund authorization for already-sold property {PropertyId} (PI {PaymentIntentId}) - manual review required.",
+                            property.PropertyId, paymentIntent.Id);
+                    }
+
+                    _logger.LogWarning(
+                        "Session {SessionId} targeted already-sold property {PropertyId}; released buyer authorization, no transaction created.",
+                        session.Id, property.PropertyId);
+                    return new FulfillmentResult(FulfillmentOutcome.AlreadySold, null);
                 }
 
                 metadata.TryGetValue("buyer_user_id", out var buyerIdRaw);

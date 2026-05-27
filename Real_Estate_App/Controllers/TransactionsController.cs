@@ -43,6 +43,15 @@ namespace Real_Estate_App.Controllers
                 return RedirectToAction("Details", "Properties", new { id });
             }
 
+            // Defend against buying a property that was already sold but later
+            // unhidden/re-listed: if a completed sale exists, block it here so
+            // the buyer never even reaches the Stripe payment page.
+            if (await _unitOfWork.Transactions.HasApprovedForPropertyAsync(id))
+            {
+                TempData["Error"] = "This property has already been sold and can no longer be purchased.";
+                return RedirectToAction("Details", "Properties", new { id });
+            }
+
             var viewModel = new CheckoutViewModel
             {
                 PropertyId = property.PropertyId,
@@ -77,6 +86,14 @@ namespace Real_Estate_App.Controllers
             if (!property.IsAvailable)
             {
                 TempData["Error"] = "This property is no longer available for purchase.";
+                return RedirectToAction("Details", "Properties", new { id = model.PropertyId });
+            }
+
+            // Same already-sold guard as the GET, in case the sale completed
+            // while the buyer had the checkout form open.
+            if (await _unitOfWork.Transactions.HasApprovedForPropertyAsync(model.PropertyId))
+            {
+                TempData["Error"] = "This property has already been sold and can no longer be purchased.";
                 return RedirectToAction("Details", "Properties", new { id = model.PropertyId });
             }
 
@@ -155,6 +172,9 @@ namespace Real_Estate_App.Controllers
                     break;
                 case FulfillmentOutcome.AmountMismatch:
                     TempData["Error"] = "There was a pricing mismatch on this payment. Please contact support.";
+                    break;
+                case FulfillmentOutcome.AlreadySold:
+                    TempData["Error"] = "This property has already been sold. You have not been charged - your payment was released/refunded in full.";
                     break;
                 default:
                     TempData["Error"] = "This property is no longer available.";

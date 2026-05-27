@@ -36,6 +36,12 @@ namespace Real_Estate_App.Services
         // when capture succeeded but the sale then fell through (lost the
         // concurrent-approval race for the property).
         Task<Refund> RefundPaymentIntentAsync(string paymentIntentId);
+
+        // Makes the buyer whole regardless of capture state: releases the hold
+        // if the payment is still only authorized ("requires_capture"), or
+        // refunds it if it was already captured ("succeeded"). Used when a sale
+        // cannot proceed because the property turned out to be already sold.
+        Task ReleaseOrRefundAsync(string paymentIntentId);
     }
 
     public class StripeService : IStripeService
@@ -160,6 +166,29 @@ namespace Real_Estate_App.Services
             _logger.LogInformation("Refunded PaymentIntent {PaymentIntentId} (refund {RefundId}, status {Status})",
                 paymentIntentId, refund.Id, refund.Status);
             return refund;
+        }
+
+        public async Task ReleaseOrRefundAsync(string paymentIntentId)
+        {
+            var pi = await GetPaymentIntentAsync(paymentIntentId);
+            if (pi.Status == "requires_capture")
+            {
+                // Authorized but never charged - just release the hold.
+                await CancelPaymentIntentAsync(paymentIntentId);
+            }
+            else if (pi.Status == "succeeded")
+            {
+                // Already captured - return the funds to the buyer.
+                await RefundPaymentIntentAsync(paymentIntentId);
+            }
+            else
+            {
+                // canceled / requires_payment_method / etc.: nothing held, so
+                // there is nothing to release or refund.
+                _logger.LogInformation(
+                    "ReleaseOrRefund: PaymentIntent {PaymentIntentId} is in status {Status}; no action needed.",
+                    paymentIntentId, pi.Status);
+            }
         }
 
         // NZD (and the other 2-decimal currencies used here) are charged in

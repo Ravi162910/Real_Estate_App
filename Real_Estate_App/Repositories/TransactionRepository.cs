@@ -31,5 +31,11 @@ namespace Real_Estate_App.Repositories
 
         public async Task<int> CountByStatusAsync(string status)
             => await _dbSet.CountAsync(t => t.Status == status);
+
+        public async Task<bool> HasApprovedForPropertyAsync(int propertyId, int? excludeTransactionId = null)
+            => await _dbSet.AnyAsync(t =>
+                t.PropertyId == propertyId &&
+                t.Status == Transaction.StatusApproved &&
+                (excludeTransactionId == null || t.TransactionId != excludeTransactionId.Value));
     }
 }

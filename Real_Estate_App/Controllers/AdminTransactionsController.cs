@@ -73,6 +73,61 @@ namespace Real_Estate_App.Controllers
                 return RedirectToAction(nameof(Details), new { ID = id });
             }
 
+            // Block double-selling. If this property already has an approved
+            // sale (e.g. it was unhidden/re-listed after being sold, or another
+            // pending request for it was approved first), do NOT capture this
+            // buyer. Release their hold (or refund if it was already captured)
+            // and reject this request so no one pays for an unavailable home.
+            if (await _unitofwork.Transactions.HasApprovedForPropertyAsync(transaction.PropertyId, transaction.TransactionId))
+            {
+                bool released = false;
+                if (!string.IsNullOrEmpty(transaction.StripePaymentIntentId))
+                {
+                    try
+                    {
+                        await _stripeService.ReleaseOrRefundAsync(transaction.StripePaymentIntentId);
+                        released = true;
+                    }
+                    catch (StripeException ex)
+                    {
+                        _logger.LogError(ex,
+                            "Failed to release/refund authorization for transaction {TransactionId} on already-sold property {PropertyId} - manual refund required.",
+                            transaction.TransactionId, transaction.PropertyId);
+                    }
+                }
+
+                transaction.Status = Transaction.StatusRejected;
+                transaction.ReviewedDate = DateTime.UtcNow;
+                transaction.ReviewedByUserId = GetCurrentUserId();
+                transaction.RejectionReason = released
+                    ? "This property had already been sold to another buyer. Your payment has been refunded in full."
+                    : "This property had already been sold to another buyer. A refund is being processed.";
+                _unitofwork.Transactions.Update(transaction);
+                await _unitofwork.SaveChangesAsync();
+
+                try
+                {
+                    await _emailService.SendPurchaseRejectedAsync(
+                        transaction.UserEmail,
+                        transaction.BuyerName,
+                        property.PropertyName,
+                        property.PropertyAddress,
+                        transaction.Price,
+                        transaction.ReviewedDate.Value,
+                        transaction.RejectionReason);
+                }
+                catch (Exception emailEx)
+                {
+                    _logger.LogError(emailEx,
+                        "Failed to send already-sold rejection email for transaction {TransactionId}", transaction.TransactionId);
+                }
+
+                TempData["error"] = released
+                    ? $"This property has already been sold. Transaction #{transaction.TransactionId} was auto-rejected and the buyer's payment was refunded."
+                    : $"This property has already been sold. Transaction #{transaction.TransactionId} was auto-rejected, but the automatic refund FAILED - a manual refund is required in the Stripe dashboard.";
+                return RedirectToAction(nameof(Index));
+            }
+
             if (!property.IsAvailable)
             {
                 TempData["error"] = "This property has already been sold to another buyer. The request has not been approved.";
