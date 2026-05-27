@@ -275,6 +275,40 @@ namespace Real_Estate_App.Data
                     ReviewedDate = new DateTime(2026, 4, 1, 10, 0, 0)
                 }
             );
+
+            // Seed data - example open homes (scheduled viewings) so a few
+            // available properties show the "Open Home Available" badge rather
+            // than every listing showing "No Open Homes available".
+            modelBuilder.Entity<OpenHome>().HasData(
+                new OpenHome
+                {
+                    OpenHomeId = 1,
+                    PropertyId = 1, // Sunny Villa
+                    StartTime = new DateTime(2026, 5, 30, 11, 0, 0),
+                    EndTime = new DateTime(2026, 5, 30, 11, 45, 0)
+                },
+                new OpenHome
+                {
+                    OpenHomeId = 2,
+                    PropertyId = 1, // Sunny Villa (second weekend)
+                    StartTime = new DateTime(2026, 6, 6, 11, 0, 0),
+                    EndTime = new DateTime(2026, 6, 6, 11, 45, 0)
+                },
+                new OpenHome
+                {
+                    OpenHomeId = 3,
+                    PropertyId = 4, // Devonport Family Home
+                    StartTime = new DateTime(2026, 5, 31, 13, 0, 0),
+                    EndTime = new DateTime(2026, 5, 31, 13, 30, 0)
+                },
+                new OpenHome
+                {
+                    OpenHomeId = 4,
+                    PropertyId = 7, // Remuera Estate
+                    StartTime = new DateTime(2026, 6, 7, 14, 0, 0),
+                    EndTime = new DateTime(2026, 6, 7, 14, 45, 0)
+                }
+            );
         }
     }
 }
