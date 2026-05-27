@@ -46,19 +46,13 @@ namespace Real_Estate_App.Controllers
             return View(unitofwork.ToList());
         }
 
-        [Authorize(Roles = "Agent")]
-        public IActionResult AddOpenHome()
-        {
-            return View();
-        }
-
         [HttpGet]
-        public IActionResult AddOpenHome(int propertyID, int openhomeID) 
+        [Authorize(Roles = "Agent")]
+        public IActionResult AddOpenHome(int propertyId)
         {
             var openhome = new OpenHome
             {
-                OpenHomeId = openhomeID,
-                PropertyId = propertyID,
+                PropertyId = propertyId,
             };
             return View(openhome);
         }
@@ -66,17 +60,15 @@ namespace Real_Estate_App.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Agent")]
-        public IActionResult AddOpenHome(OpenHome openHome, int propertyID, int openhomeID)
+        public IActionResult AddOpenHome(OpenHome openHome)
         {
-            if (ModelState.IsValid) 
+            if (ModelState.IsValid)
             {
-                openHome.OpenHomeId = openhomeID;
-                openHome.PropertyId = propertyID;
-
+                // PropertyId arrives via the hidden field; OpenHomeId is a DB identity.
                 _context.OpenHomesSet.Add(openHome);
                 _context.SaveChanges();
 
-                TempData["success"] = "Added a open home";
+                TempData["success"] = "Added an open home";
 
                 return RedirectToAction("Index");
             }

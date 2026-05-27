@@ -46,23 +46,22 @@
                     <dd class="col-sm-8">@(Model.IsAvailable ? "Yes" : "No")</dd>
 
                     <dt class="col-sm-4">All Open Homes available</dt>
-
-                    @if (Model.OpenHomes != null && Model.OpenHomes.Any())
-                    {
-                        @foreach (var openHome in Model.OpenHomes)
+                    <dd class="col-sm-8">
+                        @if (Model.OpenHomes != null && Model.OpenHomes.Any())
                         {
-                            <div>
-                                Day: @openHome.StartTime.ToShortDateString() - @openHome.EndTime.ToShortDateString()
-                            </div>
-                            <div class="mb-2">
-                                Time of Open Home: @openHome.StartTime.ToString("hh:mm tt") - @openHome.EndTime.ToString("hh:mm tt")
-                            </div>
+                            foreach (var openHome in Model.OpenHomes)
+                            {
+                                <div class="mb-2">
+                                    @openHome.StartTime.ToString("ddd dd MMM yyyy"),
+                                    @openHome.StartTime.ToString("h:mm tt") - @openHome.EndTime.ToString("h:mm tt")
+                                </div>
+                            }
                         }
-                    }
-                    else
-                    {
-                        <dd class="col-sm-8">No open home available</dd>
-                    }
+                        else
+                        {
+                            <text>No open home available</text>
+                        }
+                    </dd>
                 </dl>
             </div>
         </div>
