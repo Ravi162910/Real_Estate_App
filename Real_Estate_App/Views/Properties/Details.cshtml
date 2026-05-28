@@ -93,6 +93,29 @@
             </div>
         }
     </div>
+
+    <div class="col-md-4 mt-4 mt-md-0">
+        <div class="card shadow property-detail-card">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.PropertyName" />
+            }
+            else
+            {
+                <div class="property-detail-noimg"><i class="bi bi-house"></i> No image available</div>
+            }
+            <div class="card-body text-center">
+                @if (Model.IsAvailable)
+                {
+                    <span class="badge bg-success">Available</span>
+                }
+                else
+                {
+                    <span class="badge bg-danger">Sold / Unavailable</span>
+                }
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="mt-3">

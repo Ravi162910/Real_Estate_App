@@ -1,3 +1,32 @@
+/* ============================================================
+   Real Estate App - Global Theme
+   A polished, modern "premium real estate" look built on top of
+   Bootstrap. All rules target existing Bootstrap classes/markup,
+   so every page benefits without changing any .cshtml structure.
+   Palette: deep navy + warm gold accent on soft neutral surfaces.
+   ============================================================ */
+
+:root {
+  --rea-navy-900: #0f1f38;
+  --rea-navy-700: #16365f;
+  --rea-navy-500: #1f4e8c;
+  --rea-gold: #d4a24c;
+  --rea-gold-dark: #b9863a;
+  --rea-bg: #eef1f6;
+  --rea-surface: #ffffff;
+  --rea-ink: #1d2733;
+  --rea-muted: #5b6675;
+  --rea-border: #e3e8f0;
+  --rea-success: #1f9d6b;
+  --rea-danger: #d34857;
+  --rea-radius: 14px;
+  --rea-shadow-sm: 0 2px 6px rgba(15, 31, 56, 0.06);
+  --rea-shadow: 0 10px 30px rgba(15, 31, 56, 0.10);
+  --rea-shadow-lg: 0 18px 45px rgba(15, 31, 56, 0.16);
+  --rea-navy-gradient: linear-gradient(135deg, var(--rea-navy-900) 0%, var(--rea-navy-500) 100%);
+}
+
+/* ---------- Base ---------- */
 html {
   font-size: 14px;
 }
@@ -8,43 +37,565 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
 html {
   position: relative;
   min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+  background-color: var(--rea-bg);
+  background-image:
+    radial-gradient(1200px 500px at 100% -10%, rgba(31, 78, 140, 0.07), transparent 60%),
+    radial-gradient(900px 500px at -10% 0%, rgba(212, 162, 76, 0.07), transparent 55%);
+  background-attachment: fixed;
+  color: var(--rea-ink);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Responsive images: never let an image render wider than its container.
-   This is the baseline that keeps property photos from overflowing cards
-   and breaking the layout on phones and tablets. */
+h1, h2, h3, h4, h5, h6,
+.navbar-brand {
+  font-family: "Poppins", "Inter", system-ui, "Segoe UI", sans-serif;
+  font-weight: 600;
+  color: var(--rea-ink);
+  letter-spacing: -0.01em;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
+.form-control:focus, .form-check-input:focus, .form-select:focus {
+  box-shadow: 0 0 0 0.18rem rgba(31, 78, 140, 0.25);
+  border-color: var(--rea-navy-500);
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: saturate(160%) blur(10px);
+  -webkit-backdrop-filter: saturate(160%) blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  border-bottom: 1px solid var(--rea-border) !important;
+  transition: box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.navbar.rea-scrolled {
+  box-shadow: 0 6px 22px rgba(15, 31, 56, 0.10);
+  background: rgba(255, 255, 255, 0.97) !important;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--rea-navy-900) !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.navbar-brand .bi {
+  color: var(--rea-gold);
+  font-size: 1.35rem;
+}
+
+.navbar .nav-link {
+  font-weight: 500;
+  color: var(--rea-navy-900) !important;
+  position: relative;
+  padding-left: 0.85rem;
+  padding-right: 0.85rem;
+  transition: color 0.2s ease;
+}
+
+.navbar .nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0.85rem;
+  right: 0.85rem;
+  bottom: 0.35rem;
+  height: 2px;
+  background: var(--rea-gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.22s ease;
+  border-radius: 2px;
+}
+
+.navbar .nav-link:hover::after,
+.navbar .nav-link:focus::after {
+  transform: scaleX(1);
+}
+
+.navbar .nav-link:hover {
+  color: var(--rea-navy-500) !important;
+}
+
+.dropdown-menu {
+  border: 1px solid var(--rea-border);
+  border-radius: 12px;
+  box-shadow: var(--rea-shadow);
+  padding: 0.4rem;
+}
+
+.dropdown-menu .nav-link {
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem !important;
+}
+
+.dropdown-menu .nav-link:hover {
+  background: var(--rea-bg);
+}
+
+/* ---------- Page-title banner (card-header.bg-secondary pattern) ---------- */
+.card-header.bg-secondary {
+  background: var(--rea-navy-gradient) !important;
+  border: none !important;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-header.bg-secondary::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--rea-gold), var(--rea-gold-dark));
+}
+
+.card-header.bg-secondary h1,
+.card-header.bg-secondary h2,
+.card-header.bg-secondary h3,
+.card-header.bg-secondary h4,
+.card-header.bg-secondary p {
+  color: #fff;
+}
+
+.card-header.bg-secondary .text-muted {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
+/* The page-title cards use border-2; soften that wrapper. */
+.card.border-2 {
+  border: none !important;
+  border-radius: var(--rea-radius);
+  overflow: hidden;
+  box-shadow: var(--rea-shadow);
+}
+
+/* ---------- Cards ---------- */
+.card {
+  border: 1px solid var(--rea-border);
+  border-radius: var(--rea-radius);
+  background: var(--rea-surface);
+  box-shadow: var(--rea-shadow-sm);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.card.shadow,
+.card.border-3 {
+  box-shadow: var(--rea-shadow) !important;
+  border: 1px solid var(--rea-border) !important;
+}
+
+/* Lift effect for the listing/content cards inside the column grid. */
+.row > [class*="col-"] > .card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--rea-shadow-lg) !important;
+}
+
+.card-title {
+  font-weight: 600;
+  color: var(--rea-navy-900);
+}
+
+.card-subtitle {
+  font-weight: 500;
+}
+
+.card-footer {
+  background: transparent;
+  border-top: 1px solid var(--rea-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+}
+
+/* ---------- Property images ---------- */
 img {
   max-width: 100%;
   height: auto;
 }
 
-/* Uniform property thumbnails for the listing grids, so cards line up neatly
-   no matter what dimensions the source image has. object-fit: cover scales
-   and crops without stretching, which fixes the distorted/overflowing look. */
 .property-card-img {
   width: 100%;
-  height: 200px;
+  height: 210px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 10px;
+  display: block;
+  transition: transform 0.35s ease;
 }
 
-/* Single-image displays (property details / edit / delete): cap the photo to a
-   sensible size on large screens, while the global img rule above still keeps
-   it from overflowing on small ones. */
+.row > [class*="col-"] > .card:hover .property-card-img {
+  transform: scale(1.04);
+}
+
+/* Keep the cropping clean: hide overflow on the card body wrapper. */
+.card-body {
+  overflow: hidden;
+}
+
 .property-detail-img {
   width: 100%;
   max-width: 420px;
   height: auto;
-  border-radius: 4px;
+  border-radius: 12px;
+  box-shadow: var(--rea-shadow);
+}
+
+/* Photo card on the property Details page. The image scales fluidly with the
+   column (full width on phones, 1/3 width on desktop) and keeps a consistent
+   4:3 crop at every breakpoint. */
+.property-detail-card .card-img-top {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.property-detail-noimg {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: var(--rea-bg);
+  color: var(--rea-muted);
+  font-weight: 600;
+}
+
+.property-detail-noimg .bi {
+  font-size: 2rem;
+  color: var(--rea-gold-dark);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  border-radius: 10px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.5rem 1.05rem;
+  transition: transform 0.12s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-sm {
+  border-radius: 8px;
+  padding: 0.35rem 0.7rem;
+}
+
+.btn-lg {
+  border-radius: 12px;
+}
+
+.btn-primary {
+  background: var(--rea-navy-gradient);
+  border: none;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(31, 78, 140, 0.25);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: linear-gradient(135deg, #0c1a31 0%, #1a4378 100%);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(31, 78, 140, 0.32);
+}
+
+.btn-outline-primary {
+  color: var(--rea-navy-500);
+  border: 1.5px solid var(--rea-navy-500);
+  background: transparent;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background: var(--rea-navy-500);
+  border-color: var(--rea-navy-500);
+  color: #fff;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #157f55 0%, #1fb37a 100%);
+  border: none;
+  box-shadow: 0 6px 16px rgba(31, 157, 107, 0.25);
+}
+
+.btn-success:hover,
+.btn-success:focus {
+  background: linear-gradient(135deg, #116e49 0%, #18a06d 100%);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #c23b4a 0%, #e25767 100%);
+  border: none;
+}
+
+.btn-danger:hover,
+.btn-danger:focus {
+  background: linear-gradient(135deg, #ab3140 0%, #d34857 100%);
+}
+
+.btn-dark {
+  background: var(--rea-navy-900);
+  border: none;
+}
+
+.btn-dark:hover,
+.btn-dark:focus {
+  background: #060f1f;
+}
+
+.btn-secondary {
+  background: #eef1f6;
+  border: 1px solid var(--rea-border);
+  color: var(--rea-navy-900);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+  background: #e2e7f0;
+  color: var(--rea-navy-900);
+}
+
+.btn-outline-secondary {
+  color: var(--rea-muted);
+  border: 1.5px solid var(--rea-border);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  background: var(--rea-navy-900);
+  border-color: var(--rea-navy-900);
+  color: #fff;
+}
+
+/* ---------- Forms ---------- */
+.form-control,
+.form-select {
+  border-radius: 10px;
+  border: 1.5px solid var(--rea-border);
+  padding: 0.6rem 0.85rem;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Some views add border-3 to inputs; normalize so they match the theme. */
+.form-control.border-3,
+.form-select.border-3 {
+  border-width: 1.5px !important;
+  border-color: var(--rea-border) !important;
+}
+
+.form-control::placeholder {
+  color: #9aa4b2;
+}
+
+.form-label,
+.control-label {
+  font-weight: 600;
+  color: var(--rea-navy-900);
+  margin-bottom: 0.35rem;
+}
+
+.input-group .form-control:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-group .form-control:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Bootstrap's .form-group has no margin in BS5; add breathing room. */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+/* ---------- Badges ---------- */
+.badge {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.4em 0.7em;
+  border-radius: 999px;
+}
+
+.badge.bg-success {
+  background-color: var(--rea-success) !important;
+}
+
+.badge.bg-danger {
+  background-color: var(--rea-danger) !important;
+}
+
+/* ---------- Alerts ---------- */
+.alert {
+  border: none;
+  border-radius: 12px;
+  border-left: 4px solid transparent;
+  box-shadow: var(--rea-shadow-sm);
+}
+
+.alert-info {
+  background: #e8f1fb;
+  color: #134a83;
+  border-left-color: var(--rea-navy-500);
+}
+
+.alert-success {
+  background: #e6f6ef;
+  color: #0f6e49;
+  border-left-color: var(--rea-success);
+}
+
+.alert-danger {
+  background: #fdebed;
+  color: #a32b39;
+  border-left-color: var(--rea-danger);
+}
+
+.alert-warning {
+  background: #fdf3e3;
+  color: #8a5a12;
+  border-left-color: var(--rea-gold);
+}
+
+/* ---------- Tables (admin dashboards) ---------- */
+.table {
+  --bs-table-bg: transparent;
+  border-radius: var(--rea-radius);
+  overflow: hidden;
+  box-shadow: var(--rea-shadow-sm);
+  background: var(--rea-surface);
+}
+
+.table thead th {
+  background: var(--rea-navy-900);
+  color: #fff;
+  font-family: "Poppins", "Inter", sans-serif;
+  font-weight: 600;
+  border: none;
+  padding: 0.85rem 0.9rem;
+  vertical-align: middle;
+}
+
+.table tbody td {
+  padding: 0.75rem 0.9rem;
+  vertical-align: middle;
+  border-color: var(--rea-border);
+}
+
+.table-striped tbody tr:nth-of-type(odd) td {
+  background: #f7f9fc;
+}
+
+.table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.table-hover tbody tr:hover td,
+.table tbody tr:hover td {
+  background: #eef3fb;
+}
+
+/* ---------- Definition lists (details pages) ---------- */
+dl.row dt {
+  color: var(--rea-muted);
+  font-weight: 600;
+}
+
+dl.row dd {
+  color: var(--rea-ink);
+}
+
+/* ---------- Links ---------- */
+.card a:not(.btn) {
+  color: var(--rea-navy-500);
+  text-decoration: none;
+}
+
+.card a:not(.btn):hover {
+  text-decoration: underline;
+}
+
+/* ---------- Scroll-reveal animation (added by site.js) ---------- */
+.rea-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  will-change: opacity, transform;
+}
+
+.rea-reveal.rea-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rea-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .btn:hover,
+  .row > [class*="col-"] > .card:hover {
+    transform: none;
+  }
+}
+
+/* ---------- Back-to-top button (added by site.js) ---------- */
+.rea-to-top {
+  position: fixed;
+  left: 1.25rem;
+  bottom: 1.5rem;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: var(--rea-navy-gradient);
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1;
+  box-shadow: var(--rea-shadow);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+  z-index: 1040;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rea-to-top.rea-show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.rea-to-top:hover {
+  box-shadow: var(--rea-shadow-lg);
 }
